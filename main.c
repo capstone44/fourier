@@ -44,7 +44,19 @@ int main(void){
     struct signal imag_data;
     struct signal psdx;
     struct max_values values_for_interpolate;
+    float buf[DECIMATED_SIZE] = {0};
+    float power = 0;
     int counter = 0;
+
+    /*
+     * Initialize struct values to zero
+     */
+
+    data.length = data.fs = data.delta_f = 0;
+    real_data.length = real_data.fs = real_data.delta_f = 0;
+    imag_data.length = imag_data.fs = imag_data.delta_f = 0;
+    psdx.length = psdx.fs = psdx.delta_f = 0;
+
     /*
      * Zero the socket structures
      */
@@ -80,11 +92,12 @@ int main(void){
 
         // Send data to fft function
 
-        real_data.length = real_data.length/2;
-        imag_data.length = imag_data.length/2;
+        real_data = keepPositiveFreq(real_data);
+        imag_data = keepPositiveFreq(imag_data);
         psdx = calculateMagSquared(real_data, imag_data);
         values_for_interpolate = findPeak(psdx);
-        interpolate();
+        interpolate(psdx, values_for_interpolate, buf);
+        power = calculatePower(buf, psdx.length, psdx.delta_f);
 
         if(counter < TEST_RUN_LENGTH){
             printf("Test Run Length is: %d, Counter is at: %d\r\n", TEST_RUN_LENGTH, counter);

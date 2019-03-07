@@ -2,6 +2,8 @@
 #define GLOBALS_H_
 
 #define WINDOW_SIZE 50000
+#define DECIMATION_VALUE 3
+#define DECIMATED_SIZE WINDOW_SIZE/DECIMATION_VALUE
 
 extern float window_weights[WINDOW_SIZE];
 
@@ -9,7 +11,9 @@ extern struct signal
 {
     uint32_t length;
     uint32_t fs;
-    float samples[WINDOW_SIZE];
+    float delta_f;
+    float values[WINDOW_SIZE];
+    float frequencies[WINDOW_SIZE]
 };
 
 extern struct max_values
