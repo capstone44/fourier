@@ -2,7 +2,52 @@
 #include "timeprocessing.h"
 #include "globals.h"
 
-double reorderData();
+void GetV2(float values[], uint32_t N, *M){
+    float Signal[N];
+    int32_t val;
+    for(uint32_t i=0; i<N; i++){
+        val = int(values[i]);
+        SignalZero = 0;
+        for(uint8_t k=0; k<ADC_LENGTH; k++){
+            SignalZero += 1<<((val&(1<<ADC2_GPIO[k]))/(1<<(ADC2_GPIO[k])))
+        }
+        M[i] = SignalZero;
+    }
+}
+
+void GetV1(float values[], uint32_t N, *M2){
+    float Signal[N];
+    int32_t val;
+    for(uint32_t i=0; i<N; i++){
+        val = int(values[i]);
+        SignalZero = 0;
+        for(uint8_t k=0; k<ADC_LENGTH; k++){
+            SignalZero += 1<<((val&(1<<ADC1_GPIO[k]))/(1<<(ADC1_GPIO[k])))
+        }
+        M2[i] = SignalZero;
+    }
+}
+
+struct signal reorderData(struct signal data){
+    data.length--;
+    float M[data.length];
+    float M2[data.length];
+    int i = 0, j = 0, k = 0;
+
+    GetV2(data.values, data.length, M);
+    GetV1(data.values, data.length, M2);
+
+    while(i<sizeof(M) && j<sizeof(M2)){
+        data.values[k++] = M[i++];
+        data.values[k++] = M2[j++];
+    }
+    while(i<sizeof(M))
+        data.values[k++] = M[i++];
+    while(j<sizeof(M2))
+        data.values[k++] =M2[j++];
+    
+    return data;
+}
 
 /***********************************************/
 /* windowData will accept a a struture with    */

@@ -5,6 +5,10 @@
 #define DECIMATION_FACTOR 3
 #define DECIMATED_SIZE WINDOW_SIZE/DECIMATION_FACTOR
 #define FIR_FILTER_TAP_COUNT 121
+#define ADC_LENGTH 10
+
+const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
+const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
 extern float window_weights[WINDOW_SIZE];
 
@@ -21,6 +25,8 @@ extern struct max_values
 {
     float actual_max_value;
     float actual_max_frequency;
+    float left;
+    float right;
 }
 
 /**********************************************/

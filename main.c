@@ -87,7 +87,6 @@ int main(void){
 
         data = reorderData();
         windowData(data);
-        antiAliasFilter(data);
         decimateData();
 
         // Send data to fft function

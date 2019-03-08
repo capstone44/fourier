@@ -17,7 +17,7 @@ double reorderData();
 /* advantage of the peak smearing to get      */
 /* better points for our parabolic fit.       */
 /**********************************************/
-void windowData(float *data);
+struct signal windowData(struct signal data);
 
 /**********************************************/
 /* We are sampling way above what the beat    */
