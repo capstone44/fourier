@@ -18,7 +18,7 @@ extern struct signal
     uint32_t fs;
     float delta_f;
     float values[WINDOW_SIZE];
-    float frequencies[WINDOW_SIZE]
+    float frequencies[WINDOW_SIZE];
 };
 
 extern struct max_values

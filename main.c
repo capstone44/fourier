@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <math.h>
 #include "globals.h"
+#include "timeprocessing.h"
+#include "frequencyprocessing.h"
 
 #define CLIENT_SOCK_PATH "/tmp/power_data.sock" //This is where you send data, you are the client to the python server.
 #define SERVER_SOCK_PATH "/tmp/gui_control.sock" //This is where you receive data, you are the server to the python client.

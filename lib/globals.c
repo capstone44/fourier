@@ -1,4 +1,4 @@
-#include "global.h"
+#include "globals.h"
 #include <stdint.h>
 
 float window_weights[WINDOW_SIZE] = {};

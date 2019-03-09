@@ -1,13 +1,17 @@
 #ifndef TIMEPROCESSING_H_    /* Include guard */
 #define TIMEPROCESSING_H_
 
+void GetV2(float values[], uint32_t N, *M);
+
+void GetV1(float values[], uint32_t N, *M2);
+
 /**********************************************/
 /* The output of the ADC does not have the    */ 
 /* data in the correct order, so before and   */
 /* processing can be done, the order must     */
 /* be corrected.                              */
 /**********************************************/
-double reorderData();
+struct signal reorderData(struct signal data);
 
 /**********************************************/
 /* In order to remove multipath with a higher */
@@ -36,6 +40,9 @@ double antiAliasFilter();
 /* by three (keep every third sample).        */
 /**********************************************/
 double decimateData();
+
+
+void testCode(struct signal data);
 
 
 #endif  // TIMEPROCESSING_H_

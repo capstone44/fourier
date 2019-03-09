@@ -1,4 +1,5 @@
-#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "timeprocessing.h"
 #include "globals.h"
 
@@ -7,9 +8,9 @@ void GetV2(float values[], uint32_t N, *M){
     int32_t val;
     for(uint32_t i=0; i<N; i++){
         val = int(values[i]);
-        SignalZero = 0;
+        float SignalZero = 0;
         for(uint8_t k=0; k<ADC_LENGTH; k++){
-            SignalZero += 1<<((val&(1<<ADC2_GPIO[k]))/(1<<(ADC2_GPIO[k])))
+            SignalZero += 1<<((val&(1<<ADC2_GPIO[k]))/(1<<(ADC2_GPIO[k])));
         }
         M[i] = SignalZero;
     }
@@ -20,9 +21,9 @@ void GetV1(float values[], uint32_t N, *M2){
     int32_t val;
     for(uint32_t i=0; i<N; i++){
         val = int(values[i]);
-        SignalZero = 0;
+        float SignalZero = 0;
         for(uint8_t k=0; k<ADC_LENGTH; k++){
-            SignalZero += 1<<((val&(1<<ADC1_GPIO[k]))/(1<<(ADC1_GPIO[k])))
+            SignalZero += 1<<((val&(1<<ADC1_GPIO[k]))/(1<<(ADC1_GPIO[k])));
         }
         M2[i] = SignalZero;
     }
@@ -44,7 +45,7 @@ struct signal reorderData(struct signal data){
     while(i<sizeof(M))
         data.values[k++] = M[i++];
     while(j<sizeof(M2))
-        data.values[k++] =M2[j++];
+        data.values[k++] = M2[j++];
     
     return data;
 }
@@ -83,4 +84,19 @@ double decimateData(){
     }
     firDecimationCount++; // Increment the decimation count each time the filter fuction is called.
     return false; // Didn't run the filter.
+}
+
+void testCode(struct signal data){
+    data = reorderData(data);
+    FILE *dataOut;
+
+    dataOut = fopen("1mhz_out.txt","wb");
+
+    if(dataOut == NULL)
+        printf("Cannot create file\n\r");
+
+    for(uint32_t i=0; i<data.length; i++)
+        fprintf(dataOut, "%0.3lf\n", data.values[i]);
+
+    fclose(dataOut);
 }
