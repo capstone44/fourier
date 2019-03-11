@@ -1,6 +1,4 @@
-#include <stdint.h>
 #include "frequencyprocessing.h"
-#include "globals.h"
 
 struct signal keepPositiveFreq(struct signal data){
     data.length = data.length/2;

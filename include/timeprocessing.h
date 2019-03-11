@@ -1,7 +1,7 @@
 #ifndef TIMEPROCESSING_H_    /* Include guard */
 #define TIMEPROCESSING_H_
 
-#include <stdint.h>
+#include "globals.h"
 
 /**********************************************/
 /* As part of the reorderData function, the   */
@@ -29,7 +29,7 @@ void GetV1(uint32_t values[], uint32_t N, float *M2);
 /* above functions and then interleaves their */
 /* outputs.                                   */
 /**********************************************/
-struct signal reorderData(struct signal data);
+struct signal reorderData(uint32_t raw_adc_data[], uint32_t N);
 
 /**********************************************/
 /* In order to remove multipath with a higher */
@@ -57,7 +57,7 @@ float antiAliasFilter();
 /* the anti-alias filter, we will decimate    */
 /* by three (keep every third sample).        */
 /**********************************************/
-double decimateData();
+int decimateData();
 
 /**********************************************/
 /* This function will run one of the above    */

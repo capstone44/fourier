@@ -1,6 +1,8 @@
 #ifndef FREQUENCYPROCESSING_H_    /* Include guard */
 #define FREQUENCYPROCESSING_H_
 
+#include "globals.h"
+
 struct signal keepPositiveFreq(struct signal data);
 
 

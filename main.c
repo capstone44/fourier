@@ -41,7 +41,7 @@ int main(void){
      * Sets up the test data and structure
      */
     struct rf_data test_data;
-    struct signal initial_data;
+    uint32_t adc_read[WINDOW_SIZE];
     struct signal data;
     struct signal real_data;
     struct signal imag_data;
@@ -88,7 +88,7 @@ int main(void){
         /* TODO: The following power compute functions have not been debugged
          * and are simply placeholders while I flesh out my ideas
          */
-        data = reorderData(initial_data);
+        data = reorderData(adc_read,WINDOW_SIZE);
         windowData(data);
         decimateData();
 
