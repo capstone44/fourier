@@ -11,7 +11,7 @@
 #define FIR_FILTER_TAP_COUNT 121
 #define ADC_LENGTH 10
 
-extern float window_weights[WINDOW_SIZE];
+extern float window_weights[DECIMATED_SIZE];
 
 typedef struct signal
 {
@@ -24,10 +24,12 @@ typedef struct signal
 
 typedef struct max_values
 {
+    uint32_t left_index;
+    uint32_t right_index;
     float actual_max_value;
     float actual_max_frequency;
-    float left;
-    float right;
+    float left_value;
+    float right_value;
 }max_values;
 
 /**********************************************/

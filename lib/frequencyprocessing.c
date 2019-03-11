@@ -39,10 +39,8 @@ struct max_values findPeak(struct signal psdx){
     float actual_max_value;
     float actual_max_frequency;
     uint32_t max_frequency;
-    /* Compiler marked these unused...
-     * uint32_t left_index;
-     * uint32_t right_index;
-     */
+    uint32_t left_index;
+    uint32_t right_index;
     float tmp;
 
     for(uint32_t i=0; i<psdx.length; i++){
@@ -53,25 +51,35 @@ struct max_values findPeak(struct signal psdx){
         }
     }
 
-    left_value = psdx.values[max_frequency-1];
-    right_value = psdx.values[max_frequency+1];
+    left_index = max_frequency - 1;
+    right_index = max_frequency + 1;
+    left_value = psdx.values[left_index];
+    right_value = psdx.values[right_index];
     actual_max_frequency = (left_value - right_value)/(2*(left_value + right_value - 2*max_value));
     actual_max_value = max_value - (left_value - right_value)*actual_max_frequency/4;
     actual_max_frequency += max_frequency;
     val.actual_max_frequency = actual_max_frequency;
     val.actual_max_value = actual_max_value;
-    val.right = right_value;
-    val.left = left_value;
+    val.right_value = right_value;
+    val.left_value = left_value;
+    val.left_index = left_index;
+    val.right_index = right_index;
     return val;
 }
 
 void interpolate(struct signal psdx, struct max_values val, float *buf){
     float tmp, P1, P2, P3;
+    float left_freq = psdx.frequencies[val.left_index];
+    float right_freq = psdx.frequencies[val.right_index];
+    float max_freq = val.actual_max_frequency;
+    float max_value = val.actual_max_value;
+    float left_value = val.left_value;
+    float right value = val.right_value;
     for(uint32_t i=0; i<psdx.length-1; i++){
         tmp = psdx.frequencies[i];
-        P1 = ((tmp-val.actual_max_frequency)*(tmp-val.right))*val.left/((val.left-val.actual_max_frequency)*(val.left-val.right));
-        P2 = ((tmp-val.left)*(tmp-val.right))*val.actual_max_value/((val.actual_max_frequency-val.left)*(val.actual_max_frequency-val.right));
-        P3 = ((tmp-val.left)*(tmp-val.actual_max_frequency))*val.right/((val.right-val.left)*(val.right-val.actual_max_frequency));
+        P1 = ((tmp-max_freq)*(tmp-right_freq))*left_value/((left_freq-max_freq)*(left_freq-right_freq));
+        P2 = ((tmp-left_freq)*(tmp-right_freq))*max_value/((max_freq-left_freq)*(max_freq-right_freq));
+        P3 = ((tmp-left_freq)*(tmp-max_freq))*right_value/((right_freq-left_freq)*(right_freq-max_freq));
         buf[i] = P1 + P2 + P3;
         //if(!P(i))
         //    P(i) = 0;
@@ -83,7 +91,7 @@ float calculatePower(float *buf, uint32_t N, float delta_f){
     float P = 0;
     float scaler = delta_f/2;
     for(uint32_t i=1; i<=N; i++){
-        P += scaler*(buf[i] + buf[i-1]);
+        P += scaler * (buf[i] + buf[i-1]);
     }
     return P;
 }
