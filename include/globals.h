@@ -1,6 +1,8 @@
 #ifndef GLOBALS_H_   /* Include guard */
 #define GLOBALS_H_
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 
 #define WINDOW_SIZE 50000

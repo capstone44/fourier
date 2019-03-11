@@ -26,7 +26,7 @@ LFLAGS = -L./lib
 LIBS = -lm -lrt -ldl
 
 # define the C source files
-SRCS = main.c frequencyprocessing.c globals.c timeprocessing.c
+SRCS = main.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c
 
 # define the C object files
 #
@@ -40,6 +40,8 @@ OBJS = $(SRCS:.c=.o)
 
 # Output Directory
 ODIR = build
+
+OBJ = $(patsubst %,$(ODIR)/%,$(OBJS))
 
 # define the executable file
 MAIN = ams
@@ -56,7 +58,7 @@ all: $(MAIN)
 	@echo Built ACE Antenna Measurement System
 
 $(MAIN): $(OBJS)
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(ODIR)/$(MAIN) $(ODIR)/$(OBJS) $(LFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(ODIR)/$(MAIN) $(OBJ) $(LFLAGS) $(LIBS)
 
 # this is a suffix replacement rule for building .o's from .c's
 # it uses automatic variables $<: the name of the prerequisite of

@@ -1,7 +1,7 @@
 #ifndef TIMEPROCESSING_H_    /* Include guard */
 #define TIMEPROCESSING_H_
 
-#include <stdint.h>
+#include "globals.h"
 
 void GetV2(uint32_t values[], uint32_t N, float *M);
 

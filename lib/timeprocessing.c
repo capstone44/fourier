@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "timeprocessing.h"
-#include "globals.h"
 
 void GetV2(uint32_t values[], uint32_t N, float *M){
     uint32_t val;
