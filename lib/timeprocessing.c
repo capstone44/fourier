@@ -3,7 +3,7 @@
 #include "timeprocessing.h"
 #include "globals.h"
 
-void GetV2(float values[], uint32_t N, *M){
+void GetV2(float values[], uint32_t N, float *M){
     float Signal[N];
     int32_t val;
     for(uint32_t i=0; i<N; i++){
@@ -12,11 +12,11 @@ void GetV2(float values[], uint32_t N, *M){
         for(uint8_t k=0; k<ADC_LENGTH; k++){
             SignalZero += 1<<((val&(1<<ADC2_GPIO[k]))/(1<<(ADC2_GPIO[k])));
         }
-        M[i] = SignalZero;
+       M[i] = SignalZero;
     }
 }
 
-void GetV1(float values[], uint32_t N, *M2){
+void GetV1(float values[], uint32_t N, float *M2){
     float Signal[N];
     int32_t val;
     for(uint32_t i=0; i<N; i++){

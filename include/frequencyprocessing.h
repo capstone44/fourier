@@ -1,18 +1,18 @@
 #ifndef FREQUENCYPROCESSING_H_    /* Include guard */
 #define FREQUENCYPROCESSING_H_
 
-struct signal keepPostiveFreq(struct signal data);
+struct signal keepPositiveFreq(struct signal data);
 
 
-double calculateMagSquared(float real_data[], float imag_data, uint16_t N, uint32_t fs);
+struct signal calculateMagSquared(struct signal real_data, struct signal imag_data);
 
 
-double findPeak();
+struct max_values findPeak(struct signal psdx);
 
 
-double interpolate();
+void interpolate(struct signal psdx, struct max_values val, float *buf);
 
 
-double calculatePower();
+float calculatePower(float *buf, uint32_t N, float delta_f);
 
 #endif  // FREQUENCYPROCESSING_H_

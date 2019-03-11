@@ -12,22 +12,22 @@ const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
 extern float window_weights[WINDOW_SIZE];
 
-extern struct signal
+typedef struct signal
 {
     uint32_t length;
     uint32_t fs;
     float delta_f;
     float values[WINDOW_SIZE];
     float frequencies[WINDOW_SIZE];
-};
+}signal;
 
-extern struct max_values
+typedef struct max_values
 {
     float actual_max_value;
     float actual_max_frequency;
     float left;
     float right;
-}
+}max_values;
 
 /**********************************************/
 /* The FFT code that our system uses can only */

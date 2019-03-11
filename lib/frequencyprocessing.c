@@ -2,7 +2,7 @@
 #include "frequencyprocessing.h"
 #include "globals.h"
 
-struct signal keepPostiveFreq(struct signal data){
+struct signal keepPositiveFreq(struct signal data){
     data.length = data.length/2;
     data.delta_f = data.fs/data.length;
     uint32_t i = 0;
@@ -24,7 +24,7 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
         imag_data.values[i] *= imag_data.values[i];
         if(i != 0 && i != N){
             psdx.values[i] = 2*scaler*(real_data.values[i]+imag_data.values[i]);
-        } 
+        }
         else
         {
             psdx.values[i] = scaler*(real_data.values[i]+imag_data.values[i]);

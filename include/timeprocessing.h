@@ -1,12 +1,12 @@
 #ifndef TIMEPROCESSING_H_    /* Include guard */
 #define TIMEPROCESSING_H_
 
-void GetV2(float values[], uint32_t N, *M);
+void GetV2(float values[], uint32_t N, float *M);
 
-void GetV1(float values[], uint32_t N, *M2);
+void GetV1(float values[], uint32_t N, float *M2);
 
 /**********************************************/
-/* The output of the ADC does not have the    */ 
+/* The output of the ADC does not have the    */
 /* data in the correct order, so before and   */
 /* processing can be done, the order must     */
 /* be corrected.                              */

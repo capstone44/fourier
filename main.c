@@ -41,6 +41,7 @@ int main(void){
      * Sets up the test data and structure
      */
     struct rf_data test_data;
+    struct signal initial_data;
     struct signal data;
     struct signal real_data;
     struct signal imag_data;
@@ -84,10 +85,10 @@ int main(void){
 
     while (run){
 
-        //TODO: The following power compute functions have not been debugged
-        //and are simply placeholders while I thresh out my ideas
-
-        data = reorderData();
+        /* TODO: The following power compute functions have not been debugged
+         * and are simply placeholders while I flesh out my ideas
+         */
+        data = reorderData(initial_data);
         windowData(data);
         decimateData();
 
