@@ -3,15 +3,31 @@
 
 #include <stdint.h>
 
+/**********************************************/
+/* As part of the reorderData function, the   */
+/* data must have its magnitude extracted     */
+/* from the binary and reordered, this        */
+/* function does that for the values in the   */
+/* first ADC.                                 */
+/**********************************************/
 void GetV2(uint32_t values[], uint32_t N, float *M);
 
+/**********************************************/
+/* As part of the reorderData function, the   */
+/* data must have its magnitude extracted     */
+/* from the binary and reordered, this        */
+/* function does that for the values in the   */
+/* second ADC.                                */
+/**********************************************/
 void GetV1(uint32_t values[], uint32_t N, float *M2);
 
 /**********************************************/
 /* The output of the ADC does not have the    */
 /* data in the correct order, so before and   */
 /* processing can be done, the order must     */
-/* be corrected.                              */
+/* be corrected. This function calls the      */
+/* above functions and then interleaves their */
+/* outputs.                                   */
 /**********************************************/
 struct signal reorderData(struct signal data);
 
@@ -43,7 +59,14 @@ float antiAliasFilter();
 /**********************************************/
 double decimateData();
 
-
+/**********************************************/
+/* This function will run one of the above    */
+/* functions and then print the new data to   */
+/* an output file to compare with the         */
+/* expected values in Matlab, this will help  */
+/* validate the data and performance of the   */
+/* function under test.                       */
+/**********************************************/
 void testCode(struct signal data);
 
 
