@@ -1,14 +1,17 @@
 #include "timeprocessing.h"
 
-void GetV2(float values[], uint32_t N, float *M){
-    int32_t val;
-    float tmp, SignalZero;
+const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
+const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
+
+void GetV2(uint32_t values[], uint32_t N, float *M){
+    uint32_t val,tmp;
+    float SignalZero;
     uint32_t shift;
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
     /* current value in a signed int.       */
     for(uint32_t i=0; i<N; i++){
-        val = int(values[i]);
+        val = values[i];
         SignalZero = 0;
         tmp = 0;
         shift = 0;
@@ -36,15 +39,15 @@ void GetV2(float values[], uint32_t N, float *M){
     }
 }
 
-void GetV1(float values[], uint32_t N, float *M2){
-    int32_t val;
-    float tmp, SignalZero;
+void GetV1(uint32_t values[], uint32_t N, float *M2){
+    int32_t val,tmp;
+    float SignalZero;
     uint32_t shift;
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
     /* current value in a signed int.       */
     for(uint32_t i=0; i<N; i++){
-        val = int(values[i]);
+        val = values[i];
         SignalZero = 0;
         tmp = 0;
         shift = 0;
@@ -115,11 +118,13 @@ struct signal windowData(struct signal data){
 
 float antiAliasFilter(){
     float y = 0; //value for y queue
+    /* This needs to be rethought
     for(uint32_t i = 0; i < FIR_COEF_COUNT; i++) // Iterates through the size of the x queue.
     {
         y += queue_readElementAt(&xQueue, FIR_COEF_COUNT - i - OFFSET)*firCoefficients[i]; // Convolves x queue with the filter coefficients.
     }
     queue_overwritePush(&yQueue, y); // Add the computed value to the y queue.
+    */
     return y; //Return the value as a double.
 }
 
@@ -137,11 +142,8 @@ int decimateData(){
     */
     return 1;
 }
-
 void testCode(struct signal data){
     /* Call whichever function is under test */
-    data = reorderData(data);
-
 
     /* Print data to text file to compare with Matlab */
     FILE *dataOut;

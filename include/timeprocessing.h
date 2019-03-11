@@ -3,13 +3,15 @@
 
 #include "globals.h"
 
+extern const char ADC1_GPIO[];
+extern const char ADC2_GPIO[];
+
 /**********************************************/
 /* As part of the reorderData function, the   */
 /* data must have its magnitude extracted     */
 /* from the binary and reordered, this        */
 /* function does that for the values in the   */
 /* first ADC.                                 */
-/**********************************************/
 void GetV2(uint32_t values[], uint32_t N, float *M);
 
 /**********************************************/
