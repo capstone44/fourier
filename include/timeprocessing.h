@@ -13,7 +13,7 @@ void GetV1(uint32_t values[], uint32_t N, float *M2);
 /* processing can be done, the order must     */
 /* be corrected.                              */
 /**********************************************/
-struct signal reorderData(struct signal data);
+struct signal reorderData(uint32_t raw_adc_data[], uint32_t N);
 
 /**********************************************/
 /* In order to remove multipath with a higher */
@@ -41,7 +41,7 @@ float antiAliasFilter();
 /* the anti-alias filter, we will decimate    */
 /* by three (keep every third sample).        */
 /**********************************************/
-double decimateData();
+int decimateData();
 
 
 void testCode(struct signal data);

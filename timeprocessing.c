@@ -27,14 +27,17 @@ void GetV1(uint32_t values[], uint32_t N, float *M2){
     }
 }
 
-struct signal reorderData(struct signal data){
-    data.length--;
-    float M[data.length];
-    float M2[data.length];
+struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
+    signal data;
+    /* N can either be the length of the final structure, or the length of raw_adc_data
+     * The array initializers and size will either then be N/2, or 2*N, respectively
+     */
+    float M[N/2];
+    float M2[N/2];
     int i = 0, j = 0, k = 0;
 
-    GetV2(data.values, data.length, M);
-    GetV1(data.values, data.length, M2);
+    GetV2(raw_adc_data, N/2, M);
+    GetV1(raw_adc_data, N/2, M2);
 
     while(i<sizeof(M) && j<sizeof(M2)){
         data.values[k++] = M[i++];
@@ -45,6 +48,7 @@ struct signal reorderData(struct signal data){
     while(j<sizeof(M2))
         data.values[k++] = M2[j++];
 
+    data.length = N;
     return data;
 }
 
@@ -75,7 +79,8 @@ float antiAliasFilter(){
 }
 
 static uint16_t firDecimationCount = 0;
-double decimateData(){
+int decimateData(){
+    /* This also needs to be rethought
     if (firDecimationCount == DECIMATION_FACTOR - 1)
     {
         antiAliasFilter(); // Run antialias filter.
@@ -84,8 +89,10 @@ double decimateData(){
     }
     firDecimationCount++; // Increment the decimation count each time the filter fuction is called.
     return false; // Didn't run the filter.
+    */
+    return 1;
 }
-
+/*
 void testCode(struct signal data){
     data = reorderData(data);
     FILE *dataOut;
@@ -100,3 +107,4 @@ void testCode(struct signal data){
 
     fclose(dataOut);
 }
+*/

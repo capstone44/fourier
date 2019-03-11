@@ -26,7 +26,7 @@ LFLAGS = -L./lib
 LIBS = -lm -lrt -ldl
 
 # define the C source files
-SRCS = main.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c
+SRCS = main.c frequencyprocessing.c globals.c timeprocessing.c
 
 # define the C object files
 #
