@@ -66,7 +66,7 @@ $(MAIN): $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $(ODIR)/$@
 
 clean:
-	$(RM) $(ODIR)/*.o $(ODIR)/*~ $(ODIR)/$(MAIN)
+	$(RM) $(ODIR)/*.o $(ODIR)/*~ $(ODIR)/$(MAIN) $(ODIR)/lib/*.o
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^

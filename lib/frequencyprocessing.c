@@ -7,7 +7,7 @@ struct signal keepPositiveFreq(struct signal data){
     data.delta_f = data.fs/data.length;
     uint32_t i = 0;
     while(i<data.fs/2){
-        data.freq[i] = i;
+        data.frequencies[i] = i;
         i = i*data.delta_f;
     }
     return data;
@@ -17,12 +17,12 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
     struct signal psdx;
     psdx.length = real_data.length;
     psdx.fs = real_data.fs;
-    float scaler = 1/(psdx.fs*psdx.N);
+    float scaler = 1/(psdx.fs*psdx.length);
     for(uint32_t i=0; i<psdx.length; i++){
         psdx.frequencies[i] = real_data.frequencies[i];
         real_data.values[i] *= real_data.values[i];
         imag_data.values[i] *= imag_data.values[i];
-        if(i != 0 && i != N){
+        if(i != 0 && i != psdx.length){
             psdx.values[i] = 2*scaler*(real_data.values[i]+imag_data.values[i]);
         }
         else
@@ -41,8 +41,10 @@ struct max_values findPeak(struct signal psdx){
     float actual_max_value;
     float actual_max_frequency;
     uint32_t max_frequency;
-    uint32_t left_index;
-    uint32_t right_index;
+    /* Compiler marked these unused...
+     * uint32_t left_index;
+     * uint32_t right_index;
+     */
     float tmp;
 
     for(uint32_t i=0; i<psdx.length; i++){
@@ -68,11 +70,11 @@ struct max_values findPeak(struct signal psdx){
 void interpolate(struct signal psdx, struct max_values val, float *buf){
     float tmp, P1, P2, P3;
     for(uint32_t i=0; i<psdx.length-1; i++){
-        tmp = psdx.freq[i];
-        P1 = ((tmp-val.actual_max_frequency)*(tmp-val.right))*val.left_value/((val.left-val.actual_max_frequency)*(val.left-val.right));
+        tmp = psdx.frequencies[i];
+        P1 = ((tmp-val.actual_max_frequency)*(tmp-val.right))*val.left/((val.left-val.actual_max_frequency)*(val.left-val.right));
         P2 = ((tmp-val.left)*(tmp-val.right))*val.actual_max_value/((val.actual_max_frequency-val.left)*(val.actual_max_frequency-val.right));
-        P3 = ((tmp-val.left)*(tmp-val.actual_max_frequency))*val.right_value/((val.right-val.left)*(val.right-val.actual_max_frequency));
-        buf(i) = P1 + P2 + P3;
+        P3 = ((tmp-val.left)*(tmp-val.actual_max_frequency))*val.right/((val.right-val.left)*(val.right-val.actual_max_frequency));
+        buf[i] = P1 + P2 + P3;
         //if(!P(i))
         //    P(i) = 0;
     }

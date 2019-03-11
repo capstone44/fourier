@@ -1,6 +1,8 @@
 #ifndef GLOBALS_H_   /* Include guard */
 #define GLOBALS_H_
 
+#include <stdint.h>
+
 #define WINDOW_SIZE 50000
 #define DECIMATION_FACTOR 3
 #define DECIMATED_SIZE WINDOW_SIZE/DECIMATION_FACTOR

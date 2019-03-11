@@ -3,11 +3,10 @@
 #include "timeprocessing.h"
 #include "globals.h"
 
-void GetV2(float values[], uint32_t N, float *M){
-    float Signal[N];
-    int32_t val;
+void GetV2(uint32_t values[], uint32_t N, float *M){
+    uint32_t val;
     for(uint32_t i=0; i<N; i++){
-        val = int(values[i]);
+        val = values[i];
         float SignalZero = 0;
         for(uint8_t k=0; k<ADC_LENGTH; k++){
             SignalZero += 1<<((val&(1<<ADC2_GPIO[k]))/(1<<(ADC2_GPIO[k])));
@@ -16,11 +15,10 @@ void GetV2(float values[], uint32_t N, float *M){
     }
 }
 
-void GetV1(float values[], uint32_t N, float *M2){
-    float Signal[N];
-    int32_t val;
+void GetV1(uint32_t values[], uint32_t N, float *M2){
+    uint32_t val;
     for(uint32_t i=0; i<N; i++){
-        val = int(values[i]);
+        val = values[i];
         float SignalZero = 0;
         for(uint8_t k=0; k<ADC_LENGTH; k++){
             SignalZero += 1<<((val&(1<<ADC1_GPIO[k]))/(1<<(ADC1_GPIO[k])));
@@ -46,7 +44,7 @@ struct signal reorderData(struct signal data){
         data.values[k++] = M[i++];
     while(j<sizeof(M2))
         data.values[k++] = M2[j++];
-    
+
     return data;
 }
 
@@ -65,12 +63,14 @@ struct signal windowData(struct signal data){
 }
 
 float antiAliasFilter(){
-    float y = 0; //value for y queue
+    float y = 0;
+    /* This needs to be rethought...TODO
     for(uint32_t i = 0; i < FIR_COEF_COUNT; i++) // Iterates through the size of the x queue.
     {
         y += queue_readElementAt(&xQueue, FIR_COEF_COUNT - i - OFFSET)*firCoefficients[i]; // Convolves x queue with the filter coefficients.
     }
     queue_overwritePush(&yQueue, y); // Add the computed value to the y queue.
+    */
     return y; //Return the value as a double.
 }
 

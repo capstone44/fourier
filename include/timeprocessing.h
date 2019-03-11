@@ -1,9 +1,11 @@
 #ifndef TIMEPROCESSING_H_    /* Include guard */
 #define TIMEPROCESSING_H_
 
-void GetV2(float values[], uint32_t N, float *M);
+#include <stdint.h>
 
-void GetV1(float values[], uint32_t N, float *M2);
+void GetV2(uint32_t values[], uint32_t N, float *M);
+
+void GetV1(uint32_t values[], uint32_t N, float *M2);
 
 /**********************************************/
 /* The output of the ADC does not have the    */
@@ -32,7 +34,7 @@ struct signal windowData(struct signal data);
 /* sampled data, and to do this we need to    */
 /* first anti-alias filter the data.          */
 /**********************************************/
-double antiAliasFilter();
+float antiAliasFilter();
 
 /**********************************************/
 /* Now that the data has been passed through  */
