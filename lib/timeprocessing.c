@@ -4,8 +4,8 @@ const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
 const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
 void GetV2(uint32_t values[], uint32_t N, float *M){
-    uint32_t val;
-    float tmp, SignalZero;
+    uint32_t val,tmp;
+    float SignalZero;
     uint32_t shift;
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
@@ -40,8 +40,8 @@ void GetV2(uint32_t values[], uint32_t N, float *M){
 }
 
 void GetV1(uint32_t values[], uint32_t N, float *M2){
-    int32_t val;
-    float tmp, SignalZero;
+    int32_t val,tmp;
+    float SignalZero;
     uint32_t shift;
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
@@ -144,8 +144,6 @@ int decimateData(){
 }
 void testCode(struct signal data){
     /* Call whichever function is under test */
-    data = reorderData(data);
-
 
     /* Print data to text file to compare with Matlab */
     FILE *dataOut;
