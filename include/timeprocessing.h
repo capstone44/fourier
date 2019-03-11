@@ -12,6 +12,7 @@ extern const char ADC2_GPIO[];
 /* from the binary and reordered, this        */
 /* function does that for the values in the   */
 /* first ADC.                                 */
+/**********************************************/
 void GetV2(uint32_t values[], uint32_t N, float *M);
 
 /**********************************************/

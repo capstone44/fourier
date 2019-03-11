@@ -9,7 +9,7 @@ void GetV2(uint32_t values[], uint32_t N, float *M){
     uint32_t shift;
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
-    /* current value in a signed int.       */
+    /* current value in an unsigned int.    */
     for(uint32_t i=0; i<N; i++){
         val = values[i];
         SignalZero = 0;
@@ -45,7 +45,7 @@ void GetV1(uint32_t values[], uint32_t N, float *M2){
     uint32_t shift;
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
-    /* current value in a signed int.       */
+    /* current value in an unsigned int.    */
     for(uint32_t i=0; i<N; i++){
         val = values[i];
         SignalZero = 0;
