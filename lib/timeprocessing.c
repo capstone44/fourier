@@ -83,7 +83,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     GetV2(raw_adc_data, N/2, M);
     GetV1(raw_adc_data, N/2, M2);
 
-    /* Theese three while loops will interleave    */
+    /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
     /* both buffers still have data, then it will  */
     /* append the remaining data, if any, from the */
@@ -137,7 +137,7 @@ int decimateData(){
     */
     return 1;
 }
-/*
+
 void testCode(struct signal data){
     /* Call whichever function is under test */
     data = reorderData(data);
@@ -154,4 +154,3 @@ void testCode(struct signal data){
 
     fclose(dataOut);
 }
-*/
