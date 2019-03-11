@@ -1,5 +1,8 @@
 #include "timeprocessing.h"
 
+const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
+const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
+
 void GetV2(uint32_t values[], uint32_t N, float *M){
     uint32_t val;
     for(uint32_t i=0; i<N; i++){

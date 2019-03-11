@@ -3,6 +3,9 @@
 
 #include "globals.h"
 
+extern const char ADC1_GPIO[];
+extern const char ADC2_GPIO[];
+
 void GetV2(uint32_t values[], uint32_t N, float *M);
 
 void GetV1(uint32_t values[], uint32_t N, float *M2);
