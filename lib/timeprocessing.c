@@ -1,28 +1,76 @@
 #include "timeprocessing.h"
 
+<<<<<<< HEAD
 const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
 const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
 void GetV2(uint32_t values[], uint32_t N, float *M){
     uint32_t val;
+    float tmp, SignalZero;
+    uint32_t shift;
+    /* Iterate over the length of the data. */
+    /* Reset all variables to zero and grab */
+    /* current value in a signed int.       */
     for(uint32_t i=0; i<N; i++){
-        val = values[i];
-        float SignalZero = 0;
+        val = int(values[i]);
+        SignalZero = 0;
+        tmp = 0;
+        shift = 0;
+        /* Iterate over the GPIO pin mask array for */
+        /* this ADC, create a shift variable that   */
+        /* creates the mask by shifting the 1 the   */
+        /* amount of spaces dictated by the mask    */
+        /* array. Perform the bitwise and with the  */
+        /* mask and then divide by the value of the */
+        /* mask array, find the current value by    */
+        /* raising 2 to the power of the previous   */
+        /* value - 1 (done by shift operation), add */
+        /* to previous value.                       */
         for(uint8_t k=0; k<ADC_LENGTH; k++){
-            SignalZero += 1<<((val&(1<<ADC2_GPIO[k]))/(1<<(ADC2_GPIO[k])));
+            shift = ADC2_GPIO[k];
+            tmp = 1 << shift;
+            tmp = val & tmp;
+            tmp /= shift;
+            tmp = 1 << tmp;
+            SignalZero += tmp;
         }
-       M[i] = SignalZero;
+        /* After iterating through the mask and        */
+        /* summing the values, store in current index. */
+        M[i] = SignalZero;
     }
 }
 
 void GetV1(uint32_t values[], uint32_t N, float *M2){
-    uint32_t val;
+    int32_t val;
+    float tmp, SignalZero;
+    uint32_t shift;
+    /* Iterate over the length of the data. */
+    /* Reset all variables to zero and grab */
+    /* current value in a signed int.       */
     for(uint32_t i=0; i<N; i++){
-        val = values[i];
-        float SignalZero = 0;
+        val = int(values[i]);
+        SignalZero = 0;
+        tmp = 0;
+        shift = 0;
+        /* Iterate over the GPIO pin mask array for */
+        /* this ADC, create a shift variable that   */
+        /* creates the mask by shifting the 1 the   */
+        /* amount of spaces dictated by the mask    */
+        /* array. Perform the bitwise and with the  */
+        /* mask and then divide by the value of the */
+        /* mask array, find the current value by    */
+        /* raising 2 to the power of the previous   */
+        /* value - 1 (done by shift operation), add */
+        /* to previous value.                       */
         for(uint8_t k=0; k<ADC_LENGTH; k++){
-            SignalZero += 1<<((val&(1<<ADC1_GPIO[k]))/(1<<(ADC1_GPIO[k])));
+            shift = ADC1_GPIO[k];
+            tmp = 1 << shift;
+            tmp = val & tmp;
+            tmp /= shift;
+            SignalZero += 1 << tmp;
         }
+        /* After iterating through the mask and        */
+        /* summing the values, store in current index. */
         M2[i] = SignalZero;
     }
 }
@@ -39,6 +87,11 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     GetV2(raw_adc_data, N/2, M);
     GetV1(raw_adc_data, N/2, M2);
 
+    /* Theese three while loops will interleave    */
+    /* the data stored in the two buffers while    */
+    /* both buffers still have data, then it will  */
+    /* append the remaining data, if any, from the */
+    /* buffer that is not empty.                   */
     while(i<sizeof(M) && j<sizeof(M2)){
         data.values[k++] = M[i++];
         data.values[k++] = M2[j++];
@@ -52,14 +105,12 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     return data;
 }
 
-/***********************************************/
 /* windowData will accept a a struture with    */
 /* an array of ADC values and will multiply    */
 /* each value with a corresponding window      */
 /* weight found in the globals.c file. The     */
 /* struct with the data array will  then be    */
 /* returned to the main function.              */
-/***********************************************/
 struct signal windowData(struct signal data){
     for(uint32_t i=0; i<data.length; i++)
         data.values[i] = data.values[i] * window_weights[i];
@@ -67,14 +118,12 @@ struct signal windowData(struct signal data){
 }
 
 float antiAliasFilter(){
-    float y = 0;
-    /* This needs to be rethought...TODO
+    float y = 0; //value for y queue
     for(uint32_t i = 0; i < FIR_COEF_COUNT; i++) // Iterates through the size of the x queue.
     {
         y += queue_readElementAt(&xQueue, FIR_COEF_COUNT - i - OFFSET)*firCoefficients[i]; // Convolves x queue with the filter coefficients.
     }
     queue_overwritePush(&yQueue, y); // Add the computed value to the y queue.
-    */
     return y; //Return the value as a double.
 }
 
@@ -94,11 +143,13 @@ int decimateData(){
 }
 /*
 void testCode(struct signal data){
+    /* Call whichever function is under test */
     data = reorderData(data);
+
+
+    /* Print data to text file to compare with Matlab */
     FILE *dataOut;
-
     dataOut = fopen("1mhz_out.txt","wb");
-
     if(dataOut == NULL)
         printf("Cannot create file\n\r");
 
