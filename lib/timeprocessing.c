@@ -3,7 +3,7 @@
 const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
 const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
-void GetV2(uint32_t values[], uint32_t N, float *M){
+void GetV2(uint32_t values[], uint32_t N, float M[]){
     uint32_t val,tmp;
     float SignalZero;
     uint32_t shift;
@@ -42,7 +42,7 @@ void GetV2(uint32_t values[], uint32_t N, float *M){
     }
 }
 
-void GetV1(uint32_t values[], uint32_t N, float *M2){
+void GetV1(uint32_t values[], uint32_t N, float M2[]){
     int32_t val,tmp;
     float SignalZero;
     uint32_t shift;
@@ -83,7 +83,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
      * The array initializers and size will either then be N/2, or 2*N, respectively
      */
     uint32_t N2 = N/2;
-    printf("Value of N2: %ld", N2);
+    printf("Value of N2: %ld\n\r", N2);
     float M[N2];
     float M2[N2];
     int i = 0, j = 0, k = 0;
