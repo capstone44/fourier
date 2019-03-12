@@ -134,7 +134,6 @@ int main(void){
     #else
 
     FILE *dataIn;
-    struct signal data;
     uint32_t raw_adc_data[WINDOW_SIZE];
 
     dataIn = fopen("1mhz.bin", "wb");
@@ -145,7 +144,7 @@ int main(void){
 
     float buffer;
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
-        fscanf(dataIn, "%lf", &buffer);
+        fscanf(dataIn, "%f", &buffer);
         raw_adc_data[i] = buffer;
     }
 
