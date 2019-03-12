@@ -70,7 +70,24 @@ int decimateData();
 /* validate the data and performance of the   */
 /* function under test.                       */
 /**********************************************/
+/* This pound define is for testing convenience. In order to */
+/* test certain functions set its value to the following:    */
+/* reorderData()     : 1                                     */
+/* windowData()      : 2                                     */
+/* antiAliasFilter() : 3                                     */
+/* decimateData()    : 4                                     */
+#define TEST_FUNCTION 1
+
+#if TEST_FUNCTION == 1
+void testCode(uint32_t raw_adc_data[], uint32_t N);
+#else
 void testCode(struct signal data);
+#endif
+
+/* Need to fill this array with values from Matlab.    */
+/* May want to create a separate file for this         */
+/* because there will be 16,385 floating point values. */
+const float window_weights[DECIMATED_SIZE];
 
 
 #endif  // TIMEPROCESSING_H_

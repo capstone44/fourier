@@ -27,7 +27,12 @@ struct rf_data{
     int16_t angle;
 };
 
+/* To run normally, set TEST to 0 */
+/* To run a test, set TEST to 1   */
+#define TEST 1
+
 int main(void){
+    #if !TEST
     /*
      * Set up variables for each of the client and server sockets
      */
@@ -125,5 +130,28 @@ int main(void){
         counter++;
     }
     close(client_sock);
+
+    #else
+
+    FILE *dataIn;
+    struct signal data;
+    uint32_t raw_adc_data[WINDOW_SIZE];
+
+    dataIn = fopen("1mhz.bin", "wb");
+    if(dataIn == NULL){
+        printf("Cannot open file\n\r");
+        return -1;
+    }
+
+    float buffer;
+    for(uint32_t i=0; i<WINDOW_SIZE; i++){
+        fscanf(dataIn, "%lf", &buffer);
+        raw_adc_data[i] = buffer;
+    }
+
+    fclose(dataIn);
+    testCode(raw_adc_data, WINDOW_SIZE);
+
+    #endif
     return 0;
 }

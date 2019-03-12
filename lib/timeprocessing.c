@@ -143,20 +143,14 @@ int decimateData(){
     return 1;
 }
 
-/* This pound define is for testing convenience. In order to */
-/* test certain functions set its value to the following:    */
-/* reorderData()     : 1                                     */
-/* windowData()      : 2                                     */
-/* antiAliasFilter() : 3                                     */
-/* decimateData()    : 4                                     */
-#define TEST_FUNCTION 1
-
-// Just an idea Jacob, not even sure I want to do this yet, but I'm putting it down for now while getting my ideas out.
-
+#if TEST_FUNCTION == 1
+void testCode(uint32_t raw_adc_data[], uint32_t N){
+#else
 void testCode(struct signal data){
+#endif
     /* Call whichever function is under test */
-    #if TEST_FUNCTION == 1  // Either write separate test file or cast data to the correct struct first
-        
+    #if TEST_FUNCTION == 1
+        signal data = reorderData(raw_adc_data, N);
     #elif TEST_FUNCTION == 2
         data = windowData(data);
     #elif TEST_FUNCTION == 3
