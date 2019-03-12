@@ -90,8 +90,8 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     float M2[N2];
     int i = 0, j = 0, k = 0;
 
-    GetV2(raw_adc_data, N2, M);
-    GetV1(raw_adc_data, N2, M2);
+    M = GetV2(raw_adc_data, N2, M);
+    M2 = GetV1(raw_adc_data, N2, M2);
 
     /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
