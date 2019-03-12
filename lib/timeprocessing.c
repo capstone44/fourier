@@ -38,6 +38,7 @@ float * GetV2(uint32_t values[]){
         }
         /* After iterating through the mask and        */
         /* summing the values, store in current index. */
+        printf("SignalZero in GetV2: %f\r\n",SignalZero);
         M[i] = SignalZero;
     }
     return M;
@@ -77,6 +78,7 @@ float * GetV1(uint32_t values[]){
         }
         /* After iterating through the mask and        */
         /* summing the values, store in current index. */
+        printf("SignalZero in GetV1: %f\r\n",SignalZero);
         M2[i] = SignalZero;
     }
     return M2;
@@ -94,6 +96,10 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
 
     M = GetV2(raw_adc_data);
     M2 = GetV1(raw_adc_data);
+
+    for(uint32_t i=0; i<N2; i++){
+        printf("Value of M at i: %d is %0.3f\n",i, *(M + i++));
+    }
 
     /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
