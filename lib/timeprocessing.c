@@ -13,7 +13,7 @@ float * GetV2(uint32_t values[]){
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
     /* current value in an unsigned int.    */
-    for(uint32_t i=0; i<N; i++){
+    for(uint32_t i=0; i<WINDOW_SIZE/2; i++){
         val = values[i];
         SignalZero = 0;
         tmp = 0;
@@ -53,7 +53,7 @@ float * GetV1(uint32_t values[]){
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
     /* current value in an unsigned int.    */
-    for(uint32_t i=0; i<N; i++){
+    for(uint32_t i=0; i<WINDOW_SIZE/2; i++){
         val = values[i];
         SignalZero = 0;
         tmp = 0;
@@ -88,7 +88,8 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
      * The array initializers and size will either then be N/2, or 2*N, respectively
      */
     uint32_t N2 = N/2;
-    float * M, M2;
+    float* M;
+    float* M2;
     int i = 0, j = 0, k = 0;
 
     M = GetV2(raw_adc_data);
