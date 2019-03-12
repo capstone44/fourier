@@ -3,12 +3,10 @@
 const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
 const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
-float* GetV2(uint32_t values[], uint32_t N){
+float* GetV2(uint32_t values[], uint32_t N, float M[]){
     uint32_t val,tmp;
     float SignalZero;
     uint32_t shift;
-
-    static float M[N];
 
     printf("Value of N in GetV2: %d\n\r Value of sizeof(M) %ld\n\r", N, sizeof(M));
 
@@ -45,12 +43,10 @@ float* GetV2(uint32_t values[], uint32_t N){
     return M;
 }
 
-float* GetV1(uint32_t values[], uint32_t N){
+float* GetV1(uint32_t values[], uint32_t N, float M2[]){
     int32_t val,tmp;
     float SignalZero;
     uint32_t shift;
-    
-    static float M2[N];
 
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
@@ -91,12 +87,12 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
      */
     uint32_t N2 = N/2;
     printf("Value of N2: %d\n\r", N2);
-    float *M;
-    float *M2;
+    float tmp[N], tmp2[N];
+    float *M, *M2;
     int i = 0, j = 0, k = 0;
 
-    M = GetV2(raw_adc_data, N2);
-    M2 = GetV1(raw_adc_data, N2);
+    M = GetV2(raw_adc_data, N2, tmp);
+    M2 = GetV1(raw_adc_data, N2, tmp2);
 
     /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
