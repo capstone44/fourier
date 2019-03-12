@@ -3,10 +3,12 @@
 const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
 const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
-float* GetV2(uint32_t values[], uint32_t N, float M[]){
+float[] GetV2(uint32_t values[], uint32_t N){
     uint32_t val,tmp;
     float SignalZero;
     uint32_t shift;
+
+    static flaot M[N];
 
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
@@ -41,10 +43,12 @@ float* GetV2(uint32_t values[], uint32_t N, float M[]){
     return M;
 }
 
-float* GetV1(uint32_t values[], uint32_t N, float M2[]){
+float[] GetV1(uint32_t values[], uint32_t N){
     int32_t val,tmp;
     float SignalZero;
     uint32_t shift;
+
+    static float M2[N];
 
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
@@ -84,12 +88,11 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
      * The array initializers and size will either then be N/2, or 2*N, respectively
      */
     uint32_t N2 = N/2;
-    float tmp[N], tmp2[N];
-    float *M, *M2;
+    float M[N2], M2[N2];
     int i = 0, j = 0, k = 0;
 
-    M = GetV2(raw_adc_data, N2, tmp);
-    M2 = GetV1(raw_adc_data, N2, tmp2);
+    M = GetV2(raw_adc_data, N2);
+    M2 = GetV1(raw_adc_data, N2);
 
     /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
@@ -163,8 +166,6 @@ void testCode(struct signal data){
     #elif TEST_FUNCTION == 4
         data = decimateData(data);
     #endif
-
-    printf("Back in test function\n\r");
 
     /* Print data to text file to compare with Matlab */
     FILE *dataOut;

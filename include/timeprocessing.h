@@ -13,7 +13,7 @@ extern const char ADC2_GPIO[];
 /* function does that for the values in the   */
 /* first ADC.                                 */
 /**********************************************/
-float* GetV2(uint32_t values[], uint32_t N, float M[]);
+float* GetV2(uint32_t values[], uint32_t N);
 
 /**********************************************/
 /* As part of the reorderData function, the   */
@@ -22,7 +22,7 @@ float* GetV2(uint32_t values[], uint32_t N, float M[]);
 /* function does that for the values in the   */
 /* second ADC.                                */
 /**********************************************/
-float* GetV1(uint32_t values[], uint32_t N, float M2[]);
+float* GetV1(uint32_t values[], uint32_t N);
 
 /**********************************************/
 /* The output of the ADC does not have the    */
