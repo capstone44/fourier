@@ -8,8 +8,6 @@ float* GetV2(uint32_t values[], uint32_t N, float M[]){
     float SignalZero;
     uint32_t shift;
 
-    printf("Value of N in GetV2: %d\n\r Value of sizeof(M) %ld\n\r", N, sizeof(M));
-
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
     /* current value in an unsigned int.    */
@@ -86,7 +84,6 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
      * The array initializers and size will either then be N/2, or 2*N, respectively
      */
     uint32_t N2 = N/2;
-    printf("Value of N2: %d\n\r", N2);
     float tmp[N], tmp2[N];
     float *M, *M2;
     int i = 0, j = 0, k = 0;
@@ -103,18 +100,12 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
         data.values[k++] = M[i++];
         data.values[k++] = M2[j++];
     }
-    printf("Size of M: %ld\n\r Value of i: %d \n\r", sizeof(M), i);
-    while(i<sizeof(M)){
+    while(i<sizeof(M))
         data.values[k++] = M[i++];
-        printf("In excess while loop\n\r");
-    }
-    printf("Size of M2: %ld\n\r Value of j: %d \n\r", sizeof(M2), j);
     while(j<sizeof(M2))
         data.values[k++] = M2[j++];
 
-    printf("About to set data.length\n\r");
     data.length = N;
-    printf("Returning from reorderData\n\r");
     return data;
 }
 
@@ -182,7 +173,6 @@ void testCode(struct signal data){
         printf("Cannot create file\n\r");
 
     for(uint32_t i=0; i<data.length; i++){
-        printf("Value of i: %d\n\r Value of data.length: %d", i, data.length);
         fprintf(dataOut, "%0.3f\n", data.values[i]);
     }
 
