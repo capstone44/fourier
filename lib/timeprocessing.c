@@ -35,6 +35,7 @@ void GetV2(uint32_t values[], uint32_t N, float *M){
         }
         /* After iterating through the mask and        */
         /* summing the values, store in current index. */
+        printf("About to set signalzero\n\r");
         M[i] = SignalZero;
     }
 }
@@ -83,6 +84,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     float M2[N/2];
     int i = 0, j = 0, k = 0;
 
+    printf("About to enter GetV2\n\r");
     GetV2(raw_adc_data, N/2, M);
     GetV1(raw_adc_data, N/2, M2);
 
@@ -128,7 +130,7 @@ float antiAliasFilter(){
     return y; //Return the value as a double.
 }
 
-static uint16_t firDecimationCount = 0;
+//static uint16_t firDecimationCount = 0;
 int decimateData(){
     /* This also needs to be rethought
     if (firDecimationCount == DECIMATION_FACTOR - 1)
