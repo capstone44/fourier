@@ -95,14 +95,18 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
         data.values[k++] = M[i++];
         data.values[k++] = M2[j++];
     }
-    printf("Size of M: %d\n\r Value of i: %d \n\r", sizeof(M), i);
-    while(i<sizeof(M))
+    printf("Size of M: %ld\n\r Value of i: %d \n\r", sizeof(M), i);
+    while(i<sizeof(M)){
         data.values[k++] = M[i++];
-    printf("Size of M2: %d\n\r Value of j: %d \n\r", sizeof(M2), j);
+        printf("In excess while loop\n\r");
+    }
+    printf("Size of M2: %ld\n\r Value of j: %d \n\r", sizeof(M2), j);
     while(j<sizeof(M2))
         data.values[k++] = M2[j++];
 
+    printf("About to set data.length\n\r");
     data.length = N;
+    printf("Returning from reorderData\n\r");
     return data;
 }
 
@@ -152,7 +156,7 @@ void testCode(struct signal data){
 #endif
     /* Call whichever function is under test */
     #if TEST_FUNCTION == 1
-        signal data = reorderData(raw_adc_data, N);
+        struct signal data = reorderData(raw_adc_data, N);
     #elif TEST_FUNCTION == 2
         data = windowData(data);
     #elif TEST_FUNCTION == 3
