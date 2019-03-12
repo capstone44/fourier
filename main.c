@@ -150,6 +150,7 @@ int main(void){
         fscanf(dataIn, "%f", &buffer);
         raw_adc_data[i] = buffer;
     }
+    printf("File added array\n\r");
 
     fclose(dataIn);
     testCode(raw_adc_data, WINDOW_SIZE);
