@@ -98,7 +98,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     M2 = GetV1(raw_adc_data);
 
     for(uint32_t i=0; i<N2; i++){
-        printf("Value of M at i: %d is %0.3f\n",i, *(M + i++));
+        printf("Value of M at i: %d is %0.3f\n",i, *(M + i));
     }
 
     /* These three while loops will interleave    */
