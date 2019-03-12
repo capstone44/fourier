@@ -86,8 +86,8 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
      */
     uint32_t N2 = N/2;
     printf("Value of N2: %d\n\r", N2);
-    float M[N2];
-    float M2[N2];
+    float *M;
+    float *M2;
     int i = 0, j = 0, k = 0;
 
     M = GetV2(raw_adc_data, N2, M);
