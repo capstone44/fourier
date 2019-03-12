@@ -166,7 +166,7 @@ void testCode(struct signal data){
         printf("Cannot create file\n\r");
 
     for(uint32_t i=0; i<data.length; i++)
-        fprintf(dataOut, "%0.3lf\n", data.values[i]);
+        fprintf(dataOut, "%0.3f\n", data.values[i]);
 
     fclose(dataOut);
 }
