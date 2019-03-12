@@ -11,8 +11,6 @@
 #define FIR_FILTER_TAP_COUNT 121
 #define ADC_LENGTH 10
 
-extern float window_weights[DECIMATED_SIZE];
-
 typedef struct signal
 {
     uint32_t length;
