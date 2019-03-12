@@ -7,6 +7,9 @@ void GetV2(uint32_t values[], uint32_t N, float *M){
     uint32_t val,tmp;
     float SignalZero;
     uint32_t shift;
+
+    printf("Value of N in GetV2: %d\n\r Value of sizeof(M) %ld\n\r", N, sizeof(M));
+
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
     /* current value in an unsigned int.    */
@@ -79,12 +82,14 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     /* N can either be the length of the final structure, or the length of raw_adc_data
      * The array initializers and size will either then be N/2, or 2*N, respectively
      */
-    float M[N/2];
-    float M2[N/2];
+    uint32_t N2 = N/2;
+    printf("Value of N2: %ld", N2);
+    float M[N2];
+    float M2[N2];
     int i = 0, j = 0, k = 0;
 
-    GetV2(raw_adc_data, N/2, M);
-    GetV1(raw_adc_data, N/2, M2);
+    GetV2(raw_adc_data, N2, M);
+    GetV1(raw_adc_data, N2, M2);
 
     /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
@@ -165,14 +170,18 @@ void testCode(struct signal data){
         data = decimateData(data);
     #endif
 
+    printf("Back in test function\n\r");
+
     /* Print data to text file to compare with Matlab */
     FILE *dataOut;
     dataOut = fopen("1mhz_out.txt","wb");
     if(dataOut == NULL)
         printf("Cannot create file\n\r");
 
-    for(uint32_t i=0; i<data.length; i++)
+    for(uint32_t i=0; i<data.length; i++){
+        printf("Value of i: %d\n\r Value of data.length: %ld", i, data.length);
         fprintf(dataOut, "%0.3f\n", data.values[i]);
+    }
 
     fclose(dataOut);
 }
