@@ -102,9 +102,9 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
         data.values[k++] = M2[j++];
     }
     printf("Filling with excess\n\r");
-    while(i<sizeof(M))
+    while(i<sizeof(M)-1)
         data.values[k++] = M[i++];
-    while(j<sizeof(M2))
+    while(j<sizeof(M2)-1)
         data.values[k++] = M2[j++];
 
     data.length = N;
