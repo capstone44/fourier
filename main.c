@@ -33,7 +33,6 @@ struct rf_data{
 
 int main(void){
     #if !TEST
-    printf("Entering real main\n\r");
     /*
      * Set up variables for each of the client and server sockets
      */
@@ -133,7 +132,6 @@ int main(void){
     close(client_sock);
 
     #else
-    printf("Entering test main\n\r");
 
     FILE *dataIn;
     uint32_t raw_adc_data[WINDOW_SIZE];
@@ -143,14 +141,12 @@ int main(void){
         printf("Cannot open file\n\r");
         return -1;
     }
-    printf("File read correctly\n\r");
 
     float buffer;
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
         fscanf(dataIn, "%f", &buffer);
         raw_adc_data[i] = buffer;
     }
-    printf("File added to array\n\r");
 
     fclose(dataIn);
     testCode(raw_adc_data, WINDOW_SIZE);

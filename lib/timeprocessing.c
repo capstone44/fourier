@@ -35,7 +35,6 @@ void GetV2(uint32_t values[], uint32_t N, float *M){
         }
         /* After iterating through the mask and        */
         /* summing the values, store in current index. */
-        printf("About to set signalzero in GetV2\n\r");
         M[i] = SignalZero;
     }
 }
@@ -71,7 +70,6 @@ void GetV1(uint32_t values[], uint32_t N, float *M2){
         }
         /* After iterating through the mask and        */
         /* summing the values, store in current index. */
-        printf("About to set signalzero in GetV1\n\r");
         M2[i] = SignalZero;
     }
 }
@@ -85,26 +83,23 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     float M2[N/2];
     int i = 0, j = 0, k = 0;
 
-    printf("About to enter GetV2\n\r");
     GetV2(raw_adc_data, N/2, M);
-    printf("Finished GetV2\n\r");
     GetV1(raw_adc_data, N/2, M2);
-    printf("Finished GetV1\n\r");
 
     /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
     /* both buffers still have data, then it will  */
     /* append the remaining data, if any, from the */
     /* buffer that is not empty.                   */
-    printf("About to interleave\n\r");
     while(i<sizeof(M) && j<sizeof(M2)){
         data.values[k++] = M[i++];
         data.values[k++] = M2[j++];
     }
-    printf("Filling with excess\n\r");
-    while(i<sizeof(M)-1)
+    printf("Size of M: %d\n\r Value of i: %d \n\r", sizeof(M), i);
+    while(i<sizeof(M))
         data.values[k++] = M[i++];
-    while(j<sizeof(M2)-1)
+    printf("Size of M2: %d\n\r Value of j: %d \n\r", sizeof(M2), j);
+    while(j<sizeof(M2))
         data.values[k++] = M2[j++];
 
     data.length = N;
