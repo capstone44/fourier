@@ -142,8 +142,28 @@ int decimateData(){
     */
     return 1;
 }
+
+/* This pound define is for testing convenience. In order to */
+/* test certain functions set its value to the following:    */
+/* reorderData()     : 1                                     */
+/* windowData()      : 2                                     */
+/* antiAliasFilter() : 3                                     */
+/* decimateData()    : 4                                     */
+#define TEST_FUNCTION 1
+
+// Just an idea Jacob, not even sure I want to do this yet, but I'm putting it down for now while getting my ideas out.
+
 void testCode(struct signal data){
     /* Call whichever function is under test */
+    #if TEST_FUNCTION == 1  // Either write separate test file or cast data to the correct struct first
+        
+    #elif TEST_FUNCTION == 2
+        data = windowData(data);
+    #elif TEST_FUNCTION == 3
+        data = antiAliasFilter(data);
+    #elif TEST_FUNCTION == 4
+        data = decimateData(data);
+    #endif
 
     /* Print data to text file to compare with Matlab */
     FILE *dataOut;
