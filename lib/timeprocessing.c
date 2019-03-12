@@ -3,12 +3,10 @@
 const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
 const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
-float[] GetV2(uint32_t values[], uint32_t N){
+float* GetV2(uint32_t values[], uint32_t N, float M[]){
     uint32_t val,tmp;
     float SignalZero;
     uint32_t shift;
-
-    float[] M = new float(N);
 
     printf("Value of N in GetV2: %d\n\r Value of sizeof(M) %ld\n\r", N, sizeof(M));
 
@@ -45,13 +43,10 @@ float[] GetV2(uint32_t values[], uint32_t N){
     return M;
 }
 
-float[] GetV1(uint32_t values[], uint32_t N){
+float* GetV1(uint32_t values[], uint32_t N, float M2[]){
     int32_t val,tmp;
     float SignalZero;
     uint32_t shift;
-
-    float[] M2 = new float[N];
-
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
     /* current value in an unsigned int.    */
