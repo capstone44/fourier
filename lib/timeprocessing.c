@@ -40,6 +40,7 @@ float[] GetV2(uint32_t values[], uint32_t N, float M[]){
         /* summing the values, store in current index. */
         M[i] = SignalZero;
     }
+    return M;
 }
 
 float[] GetV1(uint32_t values[], uint32_t N, float M2[]){
@@ -75,6 +76,7 @@ float[] GetV1(uint32_t values[], uint32_t N, float M2[]){
         /* summing the values, store in current index. */
         M2[i] = SignalZero;
     }
+    return M2;
 }
 
 struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
@@ -83,7 +85,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
      * The array initializers and size will either then be N/2, or 2*N, respectively
      */
     uint32_t N2 = N/2;
-    printf("Value of N2: %ld\n\r", N2);
+    printf("Value of N2: %d\n\r", N2);
     float M[N2];
     float M2[N2];
     int i = 0, j = 0, k = 0;
@@ -179,7 +181,7 @@ void testCode(struct signal data){
         printf("Cannot create file\n\r");
 
     for(uint32_t i=0; i<data.length; i++){
-        printf("Value of i: %d\n\r Value of data.length: %ld", i, data.length);
+        printf("Value of i: %d\n\r Value of data.length: %d", i, data.length);
         fprintf(dataOut, "%0.3f\n", data.values[i]);
     }
 
