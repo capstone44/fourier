@@ -8,7 +8,7 @@ float* GetV2(uint32_t values[], uint32_t N){
     float SignalZero;
     uint32_t shift;
 
-    float M[N];
+    static float M[N];
 
     printf("Value of N in GetV2: %d\n\r Value of sizeof(M) %ld\n\r", N, sizeof(M));
 
@@ -50,7 +50,7 @@ float* GetV1(uint32_t values[], uint32_t N){
     float SignalZero;
     uint32_t shift;
     
-    float M2[N];
+    static float M2[N];
 
     /* Iterate over the length of the data. */
     /* Reset all variables to zero and grab */
