@@ -74,7 +74,7 @@ void interpolate(struct signal psdx, struct max_values val, float *buf){
     float max_freq = val.actual_max_frequency;
     float max_value = val.actual_max_value;
     float left_value = val.left_value;
-    float right value = val.right_value;
+    float right_value = val.right_value;
     for(uint32_t i=0; i<psdx.length-1; i++){
         tmp = psdx.frequencies[i];
         P1 = ((tmp-max_freq)*(tmp-right_freq))*left_value/((left_freq-max_freq)*(left_freq-right_freq));
