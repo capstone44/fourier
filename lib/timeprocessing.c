@@ -101,7 +101,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     float SignalZero1, SignalZero2;
 
     for(uint32_t i=0; i<N2; i++){
-        val = int(raw_adc_data[i]);
+        val = (int) raw_adc_data[i];
         SignalZero1 = SignalZero2 = 0;
 
         for(uint8_t k=0; k<ADC_LENGTH; k++){
