@@ -149,6 +149,7 @@ int main(void){
     fclose(dataIn);
 
     struct signal data = reorderData(raw_adc_data, WINDOW_SIZE);
+    data = decimateData(data);
     testCode(data);
 
     #endif
