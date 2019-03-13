@@ -136,7 +136,7 @@ int main(void){
     FILE *dataIn;
     uint32_t raw_adc_data[WINDOW_SIZE];
 
-    dataIn = fopen("testcode/ADCTesting/1-3m.bin", "rb");
+    dataIn = fopen("testcode/ADCTesting/750k.bin", "rb");
     if(!dataIn){
         printf("Cannot open file\n\r");
         return -1;
