@@ -77,13 +77,13 @@ struct signal decimateData(struct signal data){
     data.fs = data.fs/DECIMATION_FACTOR;
     uint32_t j = 0;
     for (uint32_t i=0; i<data.length; i++){
-        data.values[i] = data.values[j]
+        data.values[i] = data.values[j];
         j += DECIMATION_FACTOR;
     }
     return data;
 }
 
-#if TEST_FUNCTION == 2
+#if TEST_FUNCTION == 1
 void testCode(uint32_t raw_adc_data[], uint32_t N){
 #else
 void testCode(struct signal data){
@@ -92,11 +92,9 @@ void testCode(struct signal data){
     #if TEST_FUNCTION == 1
         struct signal data = reorderData(raw_adc_data, N);
     #elif TEST_FUNCTION == 2
-        data = windowData(data);
-    #elif TEST_FUNCTION == 3
-        data = antiAliasFilter(data);
-    #elif TEST_FUNCTION == 4
         data = decimateData(data);
+    #elif TEST_FUNCTION == 3
+        data = windowData(data);
     #endif
 
     /* Print data to text file to compare with Matlab */
