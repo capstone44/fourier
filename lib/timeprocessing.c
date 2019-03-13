@@ -66,7 +66,7 @@ float * GetV1(uint32_t values[]){
         /* mask and then divide by the value of the */
         /* mask array, find the current value by    */
         /* raising 2 to the power of the previous   */
-        /* value - 1 (done by shift operation), add */
+        /* value (done by shift operation), add     */
         /* to previous value.                       */
         for(uint8_t k=0; k<ADC_LENGTH; k++){
             shift = ADC1_GPIO[k];
@@ -97,7 +97,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     //M2 = GetV1(raw_adc_data);
 
     uint32_t val, tmp1, tmp2;
-    uint32_t shift1, shift2;
+    uint32_t shift, shift1, shift2;
     float SignalZero1, SignalZero2;
 
     for(uint32_t i=0; i<N2; i++){
@@ -107,16 +107,20 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
         shift1 = shift2 = 0;
 
         for(uint8_t k=0; k<ADC_LENGTH; k++){
-            shift1 = ADC2_GPIO[k];
-            tmp1 = 1 << shift1;
-            tmp1 = val & tmp1;
-            tmp1 /= shift1;
+            shift = 1 << k;         //2**k
+
+            shift1 = ADC2_GPIO[k];  //ADC2_GPIO[k]
+            shift1 = 1 << shift1;   //2**ADC2_GPIO[k]
+            tmp1 = val & shift1;    //val & 2**ADC2_GPIO[k]
+            tmp1 /= shift1;         //(val&2**ADC2_GPIO[k])/2**ADC2_GPIO[k]
+            tmp1 = shift * tmp1;    //2**k*((val&2**ADC2_GPIO[k])/2**ADC2_GPIO[k])
             SignalZero1 += 1 << tmp1;
 
             shift2 = ADC1_GPIO[k];
-            tmp2 = 1 << shift2;
-            tmp2 = val & tmp2;
+            shift2 = 1 << shift2;
+            tmp2 = val & shift2;
             tmp2 /= shift2;
+            tmp2 = shift * tmp2;
             SignalZero2 += 1 << tmp2;
         }
         M[i] = SignalZero1;
@@ -124,7 +128,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     }
 
     for(uint32_t i=0; i<N2; i++){
-        printf("Value of M at i: %d is %0.3f\n",i, *(M + i));
+        printf("Value of M at i: %d is %f\n", i, M[i]);
     }
 
     uint32_t i = 0, j = 0, k = 0;
@@ -135,13 +139,13 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     /* append the remaining data, if any, from the */
     /* buffer that is not empty.                   */
     while(i<N2 && j<N2){
-        data.values[k++] = *(M + i++);
-        data.values[k++] = *(M2 + j++);
+        data.values[k++] = M[i++];
+        data.values[k++] = M2[j++];
     }
     while(i<N2)
-        data.values[k++] = *(M + i++);
+        data.values[k++] = M[i++];
     while(j<N2)
-        data.values[k++] = *(M2 + j++);
+        data.values[k++] = M2[j++];
 
     data.length = N;
     return data;
