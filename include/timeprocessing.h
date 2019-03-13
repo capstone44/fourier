@@ -7,24 +7,6 @@ extern const char ADC1_GPIO[];
 extern const char ADC2_GPIO[];
 
 /**********************************************/
-/* As part of the reorderData function, the   */
-/* data must have its magnitude extracted     */
-/* from the binary and reordered, this        */
-/* function does that for the values in the   */
-/* first ADC.                                 */
-/**********************************************/
-float * GetV2(uint32_t values[]);
-
-/**********************************************/
-/* As part of the reorderData function, the   */
-/* data must have its magnitude extracted     */
-/* from the binary and reordered, this        */
-/* function does that for the values in the   */
-/* second ADC.                                */
-/**********************************************/
-float * GetV1(uint32_t values[]);
-
-/**********************************************/
 /* The output of the ADC does not have the    */
 /* data in the correct order, so before and   */
 /* processing can be done, the order must     */

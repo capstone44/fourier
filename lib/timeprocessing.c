@@ -3,116 +3,30 @@
 const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
 const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
 
-float * GetV2(uint32_t values[]){
-    uint32_t val,tmp;
-    float SignalZero;
-    uint32_t shift;
-
-    static float M[WINDOW_SIZE/2];
-
-    /* Iterate over the length of the data. */
-    /* Reset all variables to zero and grab */
-    /* current value in an unsigned int.    */
-    for(uint32_t i=0; i<WINDOW_SIZE/2; i++){
-        val = values[i];
-        SignalZero = 0;
-        tmp = 0;
-        shift = 0;
-        /* Iterate over the GPIO pin mask array for */
-        /* this ADC, create a shift variable that   */
-        /* creates the mask by shifting the 1 the   */
-        /* amount of spaces dictated by the mask    */
-        /* array. Perform the bitwise and with the  */
-        /* mask and then divide by the value of the */
-        /* mask array, find the current value by    */
-        /* raising 2 to the power of the previous   */
-        /* value - 1 (done by shift operation), add */
-        /* to previous value.                       */
-        for(uint8_t k=0; k<ADC_LENGTH; k++){
-            shift = ADC2_GPIO[k];
-            tmp = 1 << shift;
-            tmp = val & tmp;
-            tmp /= shift;
-            tmp = 1 << tmp;
-            SignalZero += tmp;
-        }
-        /* After iterating through the mask and        */
-        /* summing the values, store in current index. */
-        M[i] = SignalZero;
-    }
-    return M;
-}
-
-float * GetV1(uint32_t values[]){
-    uint32_t val,tmp;
-    float SignalZero;
-    uint32_t shift;
-
-    static float M2[WINDOW_SIZE/2];
-
-    /* Iterate over the length of the data. */
-    /* Reset all variables to zero and grab */
-    /* current value in an unsigned int.    */
-    for(uint32_t i=0; i<WINDOW_SIZE/2; i++){
-        val = values[i];
-        SignalZero = 0;
-        tmp = 0;
-        shift = 0;
-        /* Iterate over the GPIO pin mask array for */
-        /* this ADC, create a shift variable that   */
-        /* creates the mask by shifting the 1 the   */
-        /* amount of spaces dictated by the mask    */
-        /* array. Perform the bitwise and with the  */
-        /* mask and then divide by the value of the */
-        /* mask array, find the current value by    */
-        /* raising 2 to the power of the previous   */
-        /* value (done by shift operation), add     */
-        /* to previous value.                       */
-        for(uint8_t k=0; k<ADC_LENGTH; k++){
-            shift = ADC1_GPIO[k];
-            tmp = 1 << shift;
-            tmp = val & tmp;
-            tmp /= shift;
-            SignalZero += 1 << tmp;
-        }
-        /* After iterating through the mask and        */
-        /* summing the values, store in current index. */
-        M2[i] = SignalZero;
-    }
-    return M2;
-}
-
 struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     signal data;
     /* N can either be the length of the final structure, or the length of raw_adc_data
      * The array initializers and size will either then be N/2, or 2*N, respectively
      */
     uint32_t N2 = N/2;
-    //float* M;
-    //float* M2;
     float M[N2];
     float M2[N2];
-
-    //M = GetV2(raw_adc_data);
-    //M2 = GetV1(raw_adc_data);
 
     uint32_t val, tmp1, tmp2, tmp3;
     uint32_t magnitude, mask1, mask2;
     float SignalZero1, SignalZero2;
-
-    //FINE UP TO HERE
 
     for(uint32_t i=0; i<N2; i++){
         val = raw_adc_data[i];
         SignalZero1 = SignalZero2 = 0;
 
         for(uint8_t k=0; k<ADC_LENGTH; k++){
-            magnitude = 1 << k;         //2**k
+            magnitude = 1 << k;         
 
-            mask1 = 1 << ADC2_GPIO[k];  //2**ADC2_GPIO[k]
-            tmp1 = val & mask1;    //val & 2**ADC2_GPIO[k]
-            tmp2 = tmp1 >> ADC2_GPIO[k];         //(val&2**ADC2_GPIO[k])/2**ADC2_GPIO[k]
-            tmp3 = magnitude * tmp2;    //2**k*((val&2**ADC2_GPIO[k])/2**ADC2_GPIO[k])
+            mask1 = 1 << ADC2_GPIO[k];  
+            tmp1 = val & mask1;    
+            tmp2 = tmp1 >> ADC2_GPIO[k];         
+            tmp3 = magnitude * tmp2;    
             SignalZero1 += tmp3;
             
             mask2 = 1 << ADC1_GPIO[k];
@@ -124,12 +38,6 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
         M[i] = SignalZero1;
         M2[i] = SignalZero2;
     }
-
-    /*
-    for(uint32_t i=0; i<N2; i++){
-        printf("Value of M at i: %d is %f\n", i, M[i]);
-    }
-    */
 
     uint32_t i = 0, j = 0, k = 0;
 
