@@ -142,10 +142,9 @@ int main(void){
         return -1;
     }
 
-    float buffer;
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
         fread(&raw_adc_data[i], sizeof(uint32_t), 1, dataIn);
-        printf("raw_adc_data: %d\n\r", raw_adc_data[i]);
+        //printf("raw_adc_data: %d\n\r", raw_adc_data[i]);
     }
 
     fclose(dataIn);
