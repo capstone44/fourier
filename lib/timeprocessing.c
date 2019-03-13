@@ -96,7 +96,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     //M = GetV2(raw_adc_data);
     //M2 = GetV1(raw_adc_data);
 
-    uint32_t val, tmp1, tmp2;
+    uint32_t val, tmp1, tmp2, tmp3;
     uint32_t magnitude, mask1, mask2;
     float SignalZero1, SignalZero2;
 
