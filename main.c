@@ -146,6 +146,7 @@ int main(void){
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
         fscanf(dataIn, "%f", &buffer);
         raw_adc_data[i] = buffer;
+        printf("raw_adc_data: %d\n\r", buffer);
     }
 
     fclose(dataIn);
