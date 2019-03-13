@@ -137,16 +137,15 @@ int main(void){
     uint32_t raw_adc_data[WINDOW_SIZE];
 
     dataIn = fopen("testcode/ADCTesting/1mhz.bin", "wb");
-    if(dataIn == NULL){
+    if(!dataIn){
         printf("Cannot open file\n\r");
         return -1;
     }
 
     float buffer;
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
-        fscanf(dataIn, "%f", &buffer);
-        raw_adc_data[i] = buffer;
-        printf("raw_adc_data: %d\n\r", buffer);
+        fread(&raw_adc_data[i], sizeof(uint32_t, 1, dataIn));
+        printf("raw_adc_data: %d\n\r", raw_adc_data[i]);
     }
 
     fclose(dataIn);
