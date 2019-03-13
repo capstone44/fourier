@@ -57,9 +57,8 @@ void testCode(uint32_t raw_adc_data[], uint32_t N);
 void testCode(struct signal data);
 #endif
 
-
 /* May want to create a separate file for this         */
-/* because there are 16,667 floating point values.     */
+/* because there are 16,666 floating point values.     */
 const static float window_weights[DECIMATED_SIZE] = {
 4.3936933623407420e-02, 
 4.3969898024323419e-02, 

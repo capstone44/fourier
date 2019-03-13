@@ -20,7 +20,6 @@ void interpolate(struct signal psdx, struct max_values val, float *buf);
 
 float calculatePower(float *buf, uint32_t N, float delta_f);
 
-
 /* May want to create a separate file for this         */
 /* because there are 16,384 floating point values.     */
 const static float filter_bins[POSITIVE_HALF_FFT] = {
