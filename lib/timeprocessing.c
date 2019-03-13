@@ -96,7 +96,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     //M = GetV2(raw_adc_data);
     //M2 = GetV1(raw_adc_data);
 
-    uint32_t val1, tmp1, val2, tmp2;
+    uint32_t val, tmp1, tmp2;
     uint32_t shift1, shift2;
     float SignalZero1, SignalZero2;
 
@@ -127,7 +127,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
         printf("Value of M at i: %d is %0.3f\n",i, *(M + i));
     }
 
-    uint_32_t i = 0, j = 0, k = 0;
+    uint32_t i = 0, j = 0, k = 0;
 
     /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
