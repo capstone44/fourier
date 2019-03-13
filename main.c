@@ -136,7 +136,7 @@ int main(void){
     FILE *dataIn;
     uint32_t raw_adc_data[WINDOW_SIZE];
 
-    dataIn = fopen("testcode/ADCTesting/1mhz.bin", "wb");
+    dataIn = fopen("testcode/ADCTesting/1-3m.bin", "wb");
     if(!dataIn){
         printf("Cannot open file\n\r");
         return -1;
@@ -144,7 +144,7 @@ int main(void){
 
     float buffer;
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
-        fread(&raw_adc_data[i], sizeof(uint32_t, 1, dataIn));
+        fread(&raw_adc_data[i], sizeof(uint32_t), 1, dataIn));
         printf("raw_adc_data: %d\n\r", raw_adc_data[i]);
     }
 

@@ -211,7 +211,7 @@ void testCode(struct signal data){
 
     /* Print data to text file to compare with Matlab */
     FILE *dataOut;
-    dataOut = fopen("1mhz_out.txt","wb");
+    dataOut = fopen("dataOut.txt","wb");
     if(dataOut == NULL)
         printf("Cannot create file\n\r");
 
