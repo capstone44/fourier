@@ -106,7 +106,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
         SignalZero1 = SignalZero2 = 0;
 
         for(uint8_t k=0; k<ADC_LENGTH; k++){
-            /*shift = 1 << k;         //2**k
+            shift = 1 << k;         //2**k
 
             shift1 = ADC2_GPIO[k];  //ADC2_GPIO[k]
             shift1 = 1 << shift1;   //2**ADC2_GPIO[k]
@@ -121,10 +121,10 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
             tmp2 /= shift2;
             tmp2 = shift * tmp2;
             SignalZero2 += 1 << tmp2;
-            */
+            
 
-            SignalZero1 += (1<<k)*((val&(1<<ADC2_GPIO[k])/(1<<ADC2_GPIO[k])));
-            SignalZero2 += (1<<k)*((val&(1<<ADC1_GPIO[k])/(1<<ADC1_GPIO[k])));
+            //SignalZero1 += (1<<k)*((val&(1<<ADC2_GPIO[k])/(1<<ADC2_GPIO[k])));
+            //SignalZero2 += (1<<k)*((val&(1<<ADC1_GPIO[k])/(1<<ADC1_GPIO[k])));
         }
         M[i] = SignalZero1;
         M2[i] = SignalZero2;
