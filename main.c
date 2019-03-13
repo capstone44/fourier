@@ -149,7 +149,7 @@ int main(void){
     fclose(dataIn);
 
     struct signal data = reorderData(raw_adc_data, WINDOW_SIZE);
-    data = testCode(data);
+    testCode(data);
 
     #endif
     return 0;
