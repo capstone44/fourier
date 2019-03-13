@@ -44,7 +44,7 @@ float * GetV2(uint32_t values[]){
 }
 
 float * GetV1(uint32_t values[]){
-    int32_t val,tmp;
+    uint32_t val,tmp;
     float SignalZero;
     uint32_t shift;
 
@@ -97,30 +97,29 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     //M2 = GetV1(raw_adc_data);
 
     uint32_t val, tmp1, tmp2;
-    uint32_t shift, shift1, shift2;
+    uint32_t magnitude, mask1, mask2;
     float SignalZero1, SignalZero2;
+
+    //FINE UP TO HERE
 
     for(uint32_t i=0; i<N2; i++){
         val = raw_adc_data[i];
-        printf("Value of raw_adc_data[i]: %ld Value of val: %ld\n\r", raw_adc_data[i], val);
         SignalZero1 = SignalZero2 = 0;
 
         for(uint8_t k=0; k<ADC_LENGTH; k++){
-            shift = 1 << k;         //2**k
+            magnitude = 1 << k;         //2**k
 
-            shift1 = ADC2_GPIO[k];  //ADC2_GPIO[k]
-            shift1 = 1 << shift1;   //2**ADC2_GPIO[k]
-            tmp1 = val & shift1;    //val & 2**ADC2_GPIO[k]
-            tmp1 /= shift1;         //(val&2**ADC2_GPIO[k])/2**ADC2_GPIO[k]
-            tmp1 = shift * tmp1;    //2**k*((val&2**ADC2_GPIO[k])/2**ADC2_GPIO[k])
-            SignalZero1 += 1 << tmp1;
+            mask1 = 1 << ADC2_GPIO[k];  //2**ADC2_GPIO[k]
+            tmp1 = val & mask1;    //val & 2**ADC2_GPIO[k]
+            tmp2 = tmp1 >> ADC2_GPIO[k];         //(val&2**ADC2_GPIO[k])/2**ADC2_GPIO[k]
+            tmp3 = magnitude * tmp2;    //2**k*((val&2**ADC2_GPIO[k])/2**ADC2_GPIO[k])
+            SignalZero1 += tmp3;
             
-            shift2 = ADC1_GPIO[k];
-            shift2 = 1 << shift2;
-            tmp2 = val & shift2;
-            tmp2 /= shift2;
-            tmp2 = shift * tmp2;
-            SignalZero2 += 1 << tmp2;
+            mask2 = 1 << ADC1_GPIO[k];
+            tmp1 = val & mask2;
+            tmp2 = tmp1 >> ADC1_GPIO[k];
+            tmp3 = magnitude * tmp2;
+            SignalZero2 += tmp3;
         }
         M[i] = SignalZero1;
         M2[i] = SignalZero2;
@@ -214,7 +213,7 @@ void testCode(struct signal data){
         printf("Cannot create file\n\r");
 
     for(uint32_t i=0; i<data.length; i++){
-        fprintf(dataOut, "%0.3f\n", data.values[i]);
+        fprintf(dataOut, "%f\n", data.values[i]);
     }
 
     fclose(dataOut);
