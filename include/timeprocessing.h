@@ -27,22 +27,11 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N);
 struct signal windowData(struct signal data);
 
 /**********************************************/
-/* We are sampling way above what the beat    */
-/* frequency will be, and while this allows   */
-/* for future extension of the system, right  */
-/* now we want to increase computational      */
-/* efficiency by only keeping 1/3 of our      */
-/* sampled data, and to do this we need to    */
-/* first anti-alias filter the data.          */
-/**********************************************/
-float antiAliasFilter();
-
-/**********************************************/
 /* Now that the data has been passed through  */
 /* the anti-alias filter, we will decimate    */
 /* by three (keep every third sample).        */
 /**********************************************/
-int decimateData();
+struct signal decimateData(struct signal data);
 
 /**********************************************/
 /* This function will run one of the above    */
@@ -52,13 +41,15 @@ int decimateData();
 /* validate the data and performance of the   */
 /* function under test.                       */
 /**********************************************/
+
+/*************************************************************/
 /* This pound define is for testing convenience. In order to */
 /* test certain functions set its value to the following:    */
 /* reorderData()     : 1                                     */
-/* windowData()      : 2                                     */
-/* antiAliasFilter() : 3                                     */
-/* decimateData()    : 4                                     */
-#define TEST_FUNCTION 1
+/* decimateData()    : 2                                     */
+/* windowData()      : 3                                     */
+/*************************************************************/
+#define TEST_FUNCTION 2
 
 #if TEST_FUNCTION == 1
 void testCode(uint32_t raw_adc_data[], uint32_t N);

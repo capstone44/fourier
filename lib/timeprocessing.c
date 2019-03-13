@@ -56,6 +56,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
         data.values[k++] = M2[j++];
 
     data.length = N;
+    data.fs = 6173300;
     return data;
 }
 
@@ -71,34 +72,18 @@ struct signal windowData(struct signal data){
     return data;
 }
 
-float antiAliasFilter(){
-    float y = 0; //value for y queue
-    /* This needs to be rethought
-    for(uint32_t i = 0; i < FIR_COEF_COUNT; i++) // Iterates through the size of the x queue.
-    {
-        y += queue_readElementAt(&xQueue, FIR_COEF_COUNT - i - OFFSET)*firCoefficients[i]; // Convolves x queue with the filter coefficients.
+struct signal decimateData(struct signal data){
+    data.length = data.length/DECIMATION_FACTOR;
+    data.fs = data.fs/DECIMATION_FACTOR;
+    uint32_t j = 0;
+    for (uint32_t i=0; i<data.length; i++){
+        data.values[i] = data.values[j]
+        j += DECIMATION_FACTOR;
     }
-    queue_overwritePush(&yQueue, y); // Add the computed value to the y queue.
-    */
-    return y; //Return the value as a double.
+    return data;
 }
 
-//static uint16_t firDecimationCount = 0;
-int decimateData(){
-    /* This also needs to be rethought
-    if (firDecimationCount == DECIMATION_FACTOR - 1)
-    {
-        antiAliasFilter(); // Run antialias filter.
-        firDecimationCount = 0; // Reset decimation count.
-        return true; // Ran the filter.
-    }
-    firDecimationCount++; // Increment the decimation count each time the filter fuction is called.
-    return false; // Didn't run the filter.
-    */
-    return 1;
-}
-
-#if TEST_FUNCTION == 1
+#if TEST_FUNCTION == 2
 void testCode(uint32_t raw_adc_data[], uint32_t N){
 #else
 void testCode(struct signal data){

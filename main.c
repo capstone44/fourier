@@ -144,11 +144,12 @@ int main(void){
 
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
         fread(&raw_adc_data[i], sizeof(uint32_t), 1, dataIn);
-        //printf("raw_adc_data: %d\n\r", raw_adc_data[i]);
     }
 
     fclose(dataIn);
-    testCode(raw_adc_data, WINDOW_SIZE);
+
+    struct signal data = reorderData(raw_adc_data, N);
+    data = testCode(data);
 
     #endif
     return 0;
