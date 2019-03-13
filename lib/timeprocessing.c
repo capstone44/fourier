@@ -38,7 +38,6 @@ float * GetV2(uint32_t values[]){
         }
         /* After iterating through the mask and        */
         /* summing the values, store in current index. */
-        printf("SignalZero in GetV2: %f\r\n",SignalZero);
         M[i] = SignalZero;
     }
     return M;
@@ -78,7 +77,6 @@ float * GetV1(uint32_t values[]){
         }
         /* After iterating through the mask and        */
         /* summing the values, store in current index. */
-        printf("SignalZero in GetV1: %f\r\n",SignalZero);
         M2[i] = SignalZero;
     }
     return M2;
@@ -90,16 +88,46 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
      * The array initializers and size will either then be N/2, or 2*N, respectively
      */
     uint32_t N2 = N/2;
-    float* M;
-    float* M2;
-    int i = 0, j = 0, k = 0;
+    //float* M;
+    //float* M2;
+    float M[N2];
+    float M2[N2];
 
-    M = GetV2(raw_adc_data);
-    M2 = GetV1(raw_adc_data);
+    //M = GetV2(raw_adc_data);
+    //M2 = GetV1(raw_adc_data);
+
+    uint32_t val1, tmp1, val2, tmp2;
+    uint32_t shift1, shift2;
+    float SignalZero1, SignalZero2;
+
+    for(uint32_t i=0; i<N2; i++){
+        val = raw_adc_data[i];
+        SignalZero1 = SignalZero2 = 0;
+        tmp1 = tmp2 = 0;
+        shift1 = shift2 = 0;
+
+        for(uint8_t k=0; k<ADC_LENGTH; k++){
+            shift1 = ADC2_GPIO[k];
+            tmp1 = 1 << shift1;
+            tmp1 = val1 & tmp1;
+            tmp1 /= shift1;
+            SignalZero1 += 1 << tmp1;
+
+            shift2 = ADC1_GPIO[k];
+            tmp2 = 1 << shift2;
+            tmp2 = val2 & tmp2;
+            tmp2 /= shift2;
+            SignalZero2 += 1 << tmp2;
+        }
+        M[i] = SignalZero1;
+        M2[i] = SignalZero2;
+    }
 
     for(uint32_t i=0; i<N2; i++){
         printf("Value of M at i: %d is %0.3f\n",i, *(M + i));
     }
+
+    uint_32_t i = 0, j = 0, k = 0;
 
     /* These three while loops will interleave    */
     /* the data stored in the two buffers while    */
