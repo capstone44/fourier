@@ -189,7 +189,9 @@ int main(void){
     psdx = calculateMagSquared(real_data, imag_data);
     psdx = filter(psdx);
     val = findPeak(psdx);
-    testCodeFreq(psdx, val);
+    float buf[psdx.length];
+    interpolate(psdx, val, buf);
+    testCodeFreq(psdx, buf);
 
     #endif
 

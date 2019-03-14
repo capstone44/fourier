@@ -116,7 +116,7 @@ void testCodeFreq(struct signal real_data, struct signal imag_data){
 #elif TEST_FUNCTION_FREQ == 5
 void testCodeFreq(struct signal data, struct max_values val){
 #elif TEST_FUNCTION_FREQ == 6
-void testCodeFreq(struct signal data, *buf){
+void testCodeFreq(struct signal data, float *buf){
 #else
 void testCodeFreq(struct signal data){
 #endif
