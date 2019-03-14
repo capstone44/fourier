@@ -134,17 +134,17 @@ struct signal decimateData(struct signal data){
 /* function is under test and print the values    */
 /* to an output file for comparison with Matlab.  */
 /**************************************************/
-#if TEST_FUNCTION == 1
+#if TEST_FUNCTION_TIME == 1
 void testCodeTime(uint32_t raw_adc_data[], uint32_t N){
 #else
 void testCodeTime(struct signal data){
 #endif
     /* Call whichever function is under test */
-    #if TEST_FUNCTION == 1
+    #if TEST_FUNCTION_TIME == 1
         struct signal data = reorderData(raw_adc_data, N);
-    #elif TEST_FUNCTION == 2
+    #elif TEST_FUNCTION_TIME == 2
         data = decimateData(data);
-    #elif TEST_FUNCTION == 3
+    #elif TEST_FUNCTION_TIME == 3
         data = windowData(data);
     #endif
 

@@ -109,24 +109,24 @@ float calculatePower(float *buf, uint32_t N, float delta_f){
 /* function is under test and print the values    */
 /* to an output file for comparison with Matlab.  */
 /**************************************************/
-#if TEST_FUNCTION == 6
+#if TEST_FUNCTION_FREQ == 6
 void testCodeFreq(struct signal data, *buf){
 #else
 void testCodeFreq(struct signal data){
 #endif
     /* Call whichever function is under test */
-    #if TEST_FUNCTION == 1
+    #if TEST_FUNCTION_FREQ == 1
         data = keepPositiveFreq(data);
-    #elif TEST_FUNCTION == 2
+    #elif TEST_FUNCTION_FREQ == 2
         data = filter(data);
-    #elif TEST_FUNCTION == 3
+    #elif TEST_FUNCTION_FREQ == 3
         struct signal psdx = calculateMagSquared(data);
-    #elif TEST_FUNCTION == 4
+    #elif TEST_FUNCTION_FREQ == 4
         struct max_values val = findPeak(psdx);
-    #elif TEST_FUNCTION == 5
+    #elif TEST_FUNCTION_FREQ == 5
         float buf[psdx.length];
         interpolate(psdx, val, buf);
-    #elif TEST_FUNCTION == 6
+    #elif TEST_FUNCTION_FREQ == 6
         float Power = calculatePower(buf, psdx.length, psdx.delta_f);
     #endif
 
@@ -136,17 +136,17 @@ void testCodeFreq(struct signal data){
     if(dataOut == NULL)
         printf("Cannot create file\n\r");
 
-    #if TEST_FUNCTION == 6
+    #if TEST_FUNCTION_FREQ == 6
         printf("Power value is : %f\n\r", Power);
 
-    #elif TEST_FUNCTION == 4
+    #elif TEST_FUNCTION_FREQ == 4
         printf("Interpolated max value : %f\n\r", val.actual_max_value);
         printf("Interpolated max value frequency : %f\n\r", val.actual_max_frequency);
         printf("Interpolated left value and index: %f %d\n\r", val.left_value, val.left_index);
         printf("Interpolated right value and index: %f %d\n\r", val.right_value, val.right_index);
     #else
     for(uint32_t i=0; i<data.length; i++){
-        #if TEST_FUNCTION == 5
+        #if TEST_FUNCTION_FREQ == 5
             fprintf(dataOut, "%f\n", buf[i]);
         #else
             fprintf(dataOut, "%f\n", data.values[i]);
