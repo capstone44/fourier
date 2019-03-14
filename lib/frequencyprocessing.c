@@ -125,7 +125,7 @@ void testCodeFreq(struct signal data){
     #elif TEST_FUNCTION_FREQ == 3
         data = filter(data);
     #elif TEST_FUNCTION_FREQ == 4
-        struct max_values val = findPeak(psdx);
+        struct max_values val = findPeak(data);
     #elif TEST_FUNCTION_FREQ == 5
         float buf[psdx.length];
         interpolate(psdx, val, buf);

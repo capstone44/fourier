@@ -186,6 +186,7 @@ int main(void){
     real_data = keepPositiveFreq(real_data);
     imag_data = keepPositiveFreq(imag_data);
     psdx = calculateMagSquared(real_data, imag_data);
+    psdx = filter(psdx);
     testCodeFreq(psdx);
 
     #endif
