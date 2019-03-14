@@ -97,9 +97,13 @@ void interpolate(struct signal psdx, struct max_values val, float *buf){
 }
 
 float calculatePower(float *buf, uint32_t N, float delta_f){
+    printf("Length : %d\n\r", N);
+    printf("Delta_f : %g\n\r", delta_f);
     float P = 0;
     float scaler = delta_f/2;
     for(uint32_t i=1; i<=N; i++){
+        if(buf[i] > 0.0)
+            printf("Buffer value : %g\n\r", buf[i]);
         P += scaler * (buf[i] + buf[i-1]);
     }
     return P;
