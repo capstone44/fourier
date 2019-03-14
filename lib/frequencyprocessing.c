@@ -88,8 +88,8 @@ void interpolate(struct signal psdx, struct max_values val, float *buf){
         P2 = ((tmp-left_freq)*(tmp-right_freq))*max_value/((max_freq-left_freq)*(max_freq-right_freq));
         P3 = ((tmp-left_freq)*(tmp-max_freq))*right_value/((right_freq-left_freq)*(right_freq-max_freq));
         buf[i] = P1 + P2 + P3;
-        //if(!P(i))
-        //    P(i) = 0;
+        if(!buf[i])
+            buf[i] = 0;
     }
 
 }
@@ -111,6 +111,8 @@ float calculatePower(float *buf, uint32_t N, float delta_f){
 /**************************************************/
 #if TEST_FUNCTION_FREQ == 1 || TEST_FUNCTION_FREQ == 2
 void testCodeFreq(struct signal real_data, struct signal imag_data){
+#elif TEST_FUNCTION_FREQ == 5
+void testCodeFreq(struct signal data, struct max_values val){
 #elif TEST_FUNCTION_FREQ == 6
 void testCodeFreq(struct signal data, *buf){
 #else
@@ -127,8 +129,8 @@ void testCodeFreq(struct signal data){
     #elif TEST_FUNCTION_FREQ == 4
         struct max_values val = findPeak(data);
     #elif TEST_FUNCTION_FREQ == 5
-        float buf[psdx.length];
-        interpolate(psdx, val, buf);
+        float buf[data.length];
+        interpolate(data, val, buf);
     #elif TEST_FUNCTION_FREQ == 6
         float Power = calculatePower(buf, psdx.length, psdx.delta_f);
     #endif

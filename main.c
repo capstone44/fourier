@@ -161,6 +161,7 @@ int main(void){
     #else
 
     struct signal real_data, imag_data, psdx;
+    struct max_values val;
     real_data.length = imag_data.length = FFT_SIZE;
     real_data.fs = imag_data.fs = 6173300;
 
@@ -187,7 +188,8 @@ int main(void){
     imag_data = keepPositiveFreq(imag_data);
     psdx = calculateMagSquared(real_data, imag_data);
     psdx = filter(psdx);
-    testCodeFreq(psdx);
+    val = findPeak(psdx);
+    testCodeFreq(psdx, val);
 
     #endif
 
