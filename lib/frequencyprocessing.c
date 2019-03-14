@@ -2,7 +2,7 @@
 
 struct signal keepPositiveFreq(struct signal data){
     data.delta_f = data.fs/data.length;
-    data.length = data.length/2 + 1;
+    data.length = data.length/2;
     uint32_t j = 0;
     for(uint32_t i=0; i<data.length; i++){
         j = i*data.delta_f;
