@@ -88,7 +88,7 @@ void interpolate(struct signal psdx, struct max_values val, float *buf){
         P2 = ((tmp-left_freq)*(tmp-right_freq))*max_value/((max_freq-left_freq)*(max_freq-right_freq));
         P3 = ((tmp-left_freq)*(tmp-max_freq))*right_value/((right_freq-left_freq)*(right_freq-max_freq));
         output = P1 + P2 + P3;
-        if(output)
+        if(output > 0.0)
             buf[i] = output;
         else
             buf[i] = 0;
