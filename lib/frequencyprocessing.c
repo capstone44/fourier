@@ -15,6 +15,7 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
     struct signal psdx;
     psdx.length = real_data.length;
     psdx.fs = real_data.fs;
+    psdx.delta_f = real_data.delta_f;
     uint64_t scaler = (uint64_t) psdx.fs * (uint64_t) psdx.length * 2;
     for(uint32_t i=0; i<psdx.length+1; i++){
         psdx.frequencies[i] = real_data.frequencies[i];
