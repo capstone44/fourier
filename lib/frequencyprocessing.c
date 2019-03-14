@@ -64,7 +64,7 @@ struct max_values findPeak(struct signal psdx){
     right_value = psdx.values[right_index];
     actual_max_frequency = (left_value - right_value)/(2*(left_value + right_value - 2*max_value));
     actual_max_value = max_value - (left_value - right_value)*actual_max_frequency/4;
-    actual_max_frequency += max_frequency;
+    actual_max_frequency += psdx.frequencies[max_frequency];
     val.actual_max_frequency = actual_max_frequency;
     val.actual_max_value = actual_max_value;
     val.right_value = right_value;
