@@ -5,20 +5,34 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define WINDOW_SIZE 50000
+#define WINDOW_SIZE 50000       //Size of data coming in from ADC after interleaving
 #define DECIMATION_FACTOR 3
 #define DECIMATED_SIZE WINDOW_SIZE/DECIMATION_FACTOR
 #define ADC_LENGTH 10
 
+/**************************************************************/
+/* Struct that holds all of the info for data being processed */
+/* including its current length, sampling rate, data values   */
+/* frequency values, and change in frequency per index        */
+/**************************************************************/
 typedef struct signal
 {
     uint32_t length;
     uint32_t fs;
-    float delta_f;
     float values[WINDOW_SIZE];
     float frequencies[WINDOW_SIZE];
+    float delta_f;
 }signal;
 
+/**************************************************************/
+/* Struct that holds all of the info needed for interpolation */
+/* including the index to the left of the interpolated max    */
+/* value, the index to the right of the interpolated max      */
+/* value, the interpolated max value, the interpolated        */
+/* frequency for the max value, the actual value in the index */
+/* left of the max value index, the actual value in the index */
+/* right of the max value.                                    */
+/**************************************************************/
 typedef struct max_values
 {
     uint32_t left_index;
@@ -28,6 +42,8 @@ typedef struct max_values
     float left_value;
     float right_value;
 }max_values;
+
+/* THE FUNCTION BELOW IS NOT ACTUALLY USED, BUT WILL BE KEPT FOR FUTURE EXPANSION IF NEEDED */
 
 /**********************************************/
 /* The FFT code that our system uses can only */
