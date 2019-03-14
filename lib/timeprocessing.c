@@ -135,9 +135,9 @@ struct signal decimateData(struct signal data){
 /* to an output file for comparison with Matlab.  */
 /**************************************************/
 #if TEST_FUNCTION == 1
-void testCode(uint32_t raw_adc_data[], uint32_t N){
+void testCodeTime(uint32_t raw_adc_data[], uint32_t N){
 #else
-void testCode(struct signal data){
+void testCodeTime(struct signal data){
 #endif
     /* Call whichever function is under test */
     #if TEST_FUNCTION == 1

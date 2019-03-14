@@ -27,9 +27,12 @@ struct rf_data{
     int16_t angle;
 };
 
-/* To run normally, set TEST to 0 */
-/* To run a test, set TEST to 1   */
-#define TEST 1
+/****************************************************************/
+/* To run normally, set TEST to 0                               */
+/* To run a test on time domain functions, set TEST to 1        */
+/* To run a test on frequency domain functions, set TEST to 2   */
+/****************************************************************/
+#define TEST 2
 
 int main(void){
     #if !TEST
@@ -134,12 +137,11 @@ int main(void){
     #else
 
     FILE *dataIn;
-    //uint32_t raw_adc_data[WINDOW_SIZE];
-    struct signal data;
-    data.length = FFT_SIZE;
-    data.fs = 6173300;
 
-/*
+    #if TEST == 1
+
+    uint32_t raw_adc_data[WINDOW_SIZE];
+
     dataIn = fopen("testcode/ADCTesting/750k.bin", "rb");
     if(!dataIn){
         printf("Cannot open file\n\r");
@@ -154,11 +156,17 @@ int main(void){
 
     struct signal data = reorderData(raw_adc_data, WINDOW_SIZE);
     data = decimateData(data);
-*/
+    testCodeTime(data);
+
+    #else
+
+    struct signal data;
+    data.length = FFT_SIZE;
+    data.fs = 6173300;
 
     dataIn = fopen("testcode/ADCTesting/750k_fft.bin", "rb");
     if(!dataIn){
-        printf("Cannont open file\n\r");
+        printf("Cannot open file\n\r");
         return -1;
     }
 
@@ -168,7 +176,9 @@ int main(void){
 
     fclose(dataIn);
 
-    data = keepPositiveFreq(data);
+    testCodeFreq(data);
+
+    #endif
 
     #endif
     return 0;

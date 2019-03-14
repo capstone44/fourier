@@ -52,9 +52,9 @@ struct signal decimateData(struct signal data);
 #define TEST_FUNCTION 3
 
 #if TEST_FUNCTION == 1
-void testCode(uint32_t raw_adc_data[], uint32_t N);
+void testCodeTime(uint32_t raw_adc_data[], uint32_t N);
 #else
-void testCode(struct signal data);
+void testCodeTime(struct signal data);
 #endif
 
 /* May want to create a separate file for this         */

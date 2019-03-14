@@ -23,6 +23,25 @@ void interpolate(struct signal psdx, struct max_values val, float *buf);
 
 float calculatePower(float *buf, uint32_t N, float delta_f);
 
+
+/*************************************************************/
+/* This pound define is for testing convenience. In order to */
+/* test certain functions set its value to the following:    */
+/* keepPositiveFreq()    : 1                                 */
+/* filter()              : 2                                 */
+/* calculateMagSquared() : 3                                 */
+/* findPeak()            : 4                                 */
+/* interpolate()         : 5                                 */
+/* calculatePower()      : 6                                 */
+/*************************************************************/
+#define TEST_FUNCTION 1
+
+#if TEST_FUNCTION == 6
+void testCodeFreq(struct signal data, *buf);
+#else
+void testCodeFreq(struct signal data);
+#endif
+
 /* May want to create a separate file for this         */
 /* because there are 16,384 floating point values.     */
 const static float filter_bins[POSITIVE_HALF_FFT] = {
