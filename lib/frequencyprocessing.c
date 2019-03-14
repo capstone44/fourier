@@ -18,7 +18,7 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
     uint64_t scaler = psdx.fs*psdx.length*2;
     printf("Size of psdx: %d\n\r", psdx.length*2);
     printf("Sample rate of psdx: %d\n\r", psdx.fs);
-    printf("Scaler value: %g\n\r", scaler);
+    printf("Scaler value: %ld\n\r", scaler);
     for(uint32_t i=0; i<psdx.length; i++){
         psdx.frequencies[i] = real_data.frequencies[i];
         real_data.values[i] *= real_data.values[i];
