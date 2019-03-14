@@ -134,8 +134,12 @@ int main(void){
     #else
 
     FILE *dataIn;
-    uint32_t raw_adc_data[WINDOW_SIZE];
+    //uint32_t raw_adc_data[WINDOW_SIZE];
+    struct signal data;
+    data.length = FFT_SIZE;
+    data.fs = 6173300;
 
+/*
     dataIn = fopen("testcode/ADCTesting/750k.bin", "rb");
     if(!dataIn){
         printf("Cannot open file\n\r");
@@ -150,7 +154,21 @@ int main(void){
 
     struct signal data = reorderData(raw_adc_data, WINDOW_SIZE);
     data = decimateData(data);
-    testCode(data);
+*/
+
+    dataIn = fopen("testcode/ADCTesting/750k_fft.bin", "rb");
+    if(!dataIn){
+        printf("Cannont open file\n\r");
+        return -1;
+    }
+
+    for(uint32_t i=0; i<FFT_SIZE; i++){
+        fread(&data.values[i], sizeof(float), 1, dataIn);
+    }
+
+    fclose(dataIn);
+
+    data = keepPositiveFreq(data);
 
     #endif
     return 0;

@@ -1,12 +1,19 @@
 #include "frequencyprocessing.h"
 
 struct signal keepPositiveFreq(struct signal data){
-    data.length = data.length/2;
-    data.delta_f = data.fs/data.length;
-    uint32_t i = 0;
-    while(i<data.fs/2){
-        data.frequencies[i] = i;
-        i = i*data.delta_f;
+    data.length = data.length/2 + 1;
+    data.delta_f = data.fs/(2*data.length);
+    uint32_t j = 0;
+    for(uint32_t i=0; i<data.length; i++){
+        j = i*data.delta_f;
+        data.frequencies[i] = j;
+    }
+    return data;
+}
+
+struct signal filter(struct signal data){
+    for(uint32_t i=0; i<data.length; i++){
+        data.values[i] *= filter_bins[i];
     }
     return data;
 }

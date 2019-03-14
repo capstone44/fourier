@@ -4,9 +4,12 @@
 #include "globals.h"
 
 #define FFT_SIZE 32768
-#define POSITIVE_HALF_FFT FFT_SIZE/2
+#define POSITIVE_HALF_FFT FFT_SIZE/2 + 1
 
 struct signal keepPositiveFreq(struct signal data);
+
+
+struct signal filter(struct signal data);
 
 
 struct signal calculateMagSquared(struct signal real_data, struct signal imag_data);
