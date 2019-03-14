@@ -160,7 +160,7 @@ int main(void){
 
     #else
 
-    struct signal real_data, imag_data;
+    struct signal real_data, imag_data, psdx;
     real_data.length = imag_data.length = FFT_SIZE;
     real_data.fs = imag_data.fs = 6173300;
 
@@ -185,7 +185,8 @@ int main(void){
 
     real_data = keepPositiveFreq(real_data);
     imag_data = keepPositiveFreq(imag_data);
-    testCodeFreq(real_data, imag_data);
+    psdx = calculateMagSquared(real_data, imag_data);
+    testCodeFreq(psdx);
 
     #endif
 
