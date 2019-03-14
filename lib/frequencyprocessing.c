@@ -125,7 +125,7 @@ void testCodeFreq(struct signal data){
         real_data = keepPositiveFreq(real_data);
         imag_data = keepPositiveFreq(imag_data);
     #elif TEST_FUNCTION_FREQ == 2
-        struct signal psdx = calculateMagSquared(real_data, imag_data); 
+        struct freq_signal psdx = calculateMagSquared(real_data, imag_data); 
     #elif TEST_FUNCTION_FREQ == 3
         data = filter(data);
     #elif TEST_FUNCTION_FREQ == 4
