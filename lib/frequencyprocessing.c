@@ -1,8 +1,8 @@
 #include "frequencyprocessing.h"
 
 struct signal keepPositiveFreq(struct signal data){
+    data.delta_f = data.fs/data.length;
     data.length = data.length/2 + 1;
-    data.delta_f = data.fs/(2*data.length);
     uint32_t j = 0;
     for(uint32_t i=0; i<data.length; i++){
         j = i*data.delta_f;
@@ -15,15 +15,15 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
     struct signal psdx;
     psdx.length = real_data.length;
     psdx.fs = real_data.fs;
-    double scaler = 1/(psdx.fs*psdx.length*2);
+    float scaler = 1/(psdx.fs*psdx.length*2);
     printf("Size of psdx: %d\n\r", psdx.length*2);
     printf("Sample rate of psdx: %d\n\r", psdx.fs);
-    printf("Scaler value: %lf\n\r", scaler);
+    printf("Scaler value: %e\n\r", scaler);
     for(uint32_t i=0; i<psdx.length; i++){
         psdx.frequencies[i] = real_data.frequencies[i];
         real_data.values[i] *= real_data.values[i];
         imag_data.values[i] *= imag_data.values[i];
-        if(i != 0 && i != psdx.length){
+        if(i != 0 && i != psdx.length-1){
             psdx.values[i] = 2*scaler*(real_data.values[i]+imag_data.values[i]);
         }
         else
