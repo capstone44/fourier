@@ -15,21 +15,21 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
     struct signal psdx;
     psdx.length = real_data.length;
     psdx.fs = real_data.fs;
-    float scaler = 1/(psdx.fs*psdx.length*2);
-    printf("Size of psdx: %d\n\r", psdx.length*2);
-    printf("Sample rate of psdx: %d\n\r", psdx.fs);
+    float scaler = (psdx.fs*psdx.length*2);
+    printf("Size of psdx: %g\n\r", psdx.length*2);
+    printf("Sample rate of psdx: %g\n\r", psdx.fs);
     printf("Scaler value: %g\n\r", scaler);
     for(uint32_t i=0; i<psdx.length; i++){
         psdx.frequencies[i] = real_data.frequencies[i];
         real_data.values[i] *= real_data.values[i];
         imag_data.values[i] *= imag_data.values[i];
         if(i != 0 && i != psdx.length-1){
-            psdx.values[i] = 2*scaler*(real_data.values[i]+imag_data.values[i]);
+            psdx.values[i] = 2*(real_data.values[i]+imag_data.values[i])/scaler;
         }
         else
         {
-            psdx.values[i] = scaler*(real_data.values[i]+imag_data.values[i]);
-            printf("First or last psdx value: %f\n\r", psdx.values[i]);
+            psdx.values[i] = (real_data.values[i]+imag_data.values[i])/scaler;
+            printf("First or last psdx value: %g\n\r", psdx.values[i]);
         }
     }
     return psdx;
