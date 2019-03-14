@@ -24,11 +24,11 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
         real_data.values[i] *= real_data.values[i];
         imag_data.values[i] *= imag_data.values[i];
         if(i != 0 && i != psdx.length-1){
-            psdx.values[i] = 2*(real_data.values[i]+imag_data.values[i]);
+            psdx.values[i] = 2*(real_data.values[i]+imag_data.values[i])/scaler;
         }
         else
         {
-            psdx.values[i] = (real_data.values[i]+imag_data.values[i]);
+            psdx.values[i] = (real_data.values[i]+imag_data.values[i])/scaler;
             printf("First or last psdx value: %g\n\r", psdx.values[i]);
         }
     }
