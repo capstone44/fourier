@@ -183,6 +183,8 @@ int main(void){
     fclose(dataInReal);
     fclose(dataInImag);
 
+    real_data = keepPositiveFreq(real_data);
+    imag_data = keepPositiveFreq(imag_data);
     testCodeFreq(real_data, imag_data);
 
     #endif

@@ -34,9 +34,9 @@ float calculatePower(float *buf, uint32_t N, float delta_f);
 /* interpolate()         : 5                                 */
 /* calculatePower()      : 6                                 */
 /*************************************************************/
-#define TEST_FUNCTION_FREQ 1
+#define TEST_FUNCTION_FREQ 2
 
-#if TEST_FUNCTION_FREQ == 1
+#if TEST_FUNCTION_FREQ == 1 || TEST_FUNCTION_FREQ == 2
 void testCodeFreq(struct signal real_data, struct signal imag_data);
 #elif TEST_FUNCTION_FREQ == 6
 void testCodeFreq(struct signal data, *buf);

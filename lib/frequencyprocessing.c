@@ -109,7 +109,7 @@ float calculatePower(float *buf, uint32_t N, float delta_f){
 /* function is under test and print the values    */
 /* to an output file for comparison with Matlab.  */
 /**************************************************/
-#if TEST_FUNCTION_FREQ == 1
+#if TEST_FUNCTION_FREQ == 1 || TEST_FUNCTION_FREQ == 2
 void testCodeFreq(struct signal real_data, struct signal imag_data){
 #elif TEST_FUNCTION_FREQ == 6
 void testCodeFreq(struct signal data, *buf){
@@ -121,9 +121,9 @@ void testCodeFreq(struct signal data){
         real_data = keepPositiveFreq(real_data);
         imag_data = keepPositiveFreq(imag_data);
     #elif TEST_FUNCTION_FREQ == 2
-        data = filter(data);
+        struct signal psdx = calculateMagSquared(real_data, imag_data); 
     #elif TEST_FUNCTION_FREQ == 3
-        struct signal psdx = calculateMagSquared(data);
+        data = filter(data);
     #elif TEST_FUNCTION_FREQ == 4
         struct max_values val = findPeak(psdx);
     #elif TEST_FUNCTION_FREQ == 5
@@ -159,7 +159,7 @@ void testCodeFreq(struct signal data){
         printf("Interpolated left value and index: %f %d\n\r", val.left_value, val.left_index);
         printf("Interpolated right value and index: %f %d\n\r", val.right_value, val.right_index);
     #else
-    #if TEST_FUNCTION_FREQ == 1
+    #if TEST_FUNCTION_FREQ == 1 || TEST_FUNCTION_FREQ == 2
     for(uint32_t i=0; i<real_data.length; i++){  
     #else
     for(uint32_t i=0; i<data.length; i++){
@@ -169,6 +169,8 @@ void testCodeFreq(struct signal data){
             fprintf(imagDataOut, "%f\n", imag_data.values[i]);
         #elif TEST_FUNCTION_FREQ == 5
             fprintf(dataOut, "%f\n", buf[i]);
+        #elif TEST_FUNCTION_FREQ == 2
+            fprintf(dataOut, "%f\n", psdx.values[i]);
         #else
             fprintf(dataOut, "%f\n", data.values[i]);
         #endif
