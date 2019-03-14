@@ -172,7 +172,7 @@ void testCodeFreq(struct signal data){
         #elif TEST_FUNCTION_FREQ == 2
             fprintf(dataOut, "%f\n", psdx.values[i]);
         #else
-            fprintf(dataOut, "%f\n", data.values[i]);
+            fprintf(dataOut, "%g\n", data.values[i]);
         #endif
     }
     #endif
