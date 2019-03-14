@@ -11,13 +11,6 @@ struct signal keepPositiveFreq(struct signal data){
     return data;
 }
 
-struct signal filter(struct signal data){
-    for(uint32_t i=0; i<data.length; i++){
-        data.values[i] *= filter_bins[i];
-    }
-    return data;
-}
-
 struct signal calculateMagSquared(struct signal real_data, struct signal imag_data){
     struct signal psdx;
     psdx.length = real_data.length;
@@ -36,6 +29,13 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
         }
     }
     return psdx;
+}
+
+struct signal filter(struct signal data){
+    for(uint32_t i=0; i<data.length; i++){
+        data.values[i] *= filter_mag_squared[i];
+    }
+    return data;
 }
 
 struct max_values findPeak(struct signal psdx){
@@ -109,14 +109,17 @@ float calculatePower(float *buf, uint32_t N, float delta_f){
 /* function is under test and print the values    */
 /* to an output file for comparison with Matlab.  */
 /**************************************************/
-#if TEST_FUNCTION_FREQ == 6
+#if TEST_FUNCTION_FREQ == 1
+void testCodeFreq(struct signal real_data, struct signal imag_data){
+#elif TEST_FUNCTION_FREQ == 6
 void testCodeFreq(struct signal data, *buf){
 #else
 void testCodeFreq(struct signal data){
 #endif
     /* Call whichever function is under test */
     #if TEST_FUNCTION_FREQ == 1
-        data = keepPositiveFreq(data);
+        real_data = keepPositiveFreq(real_data);
+        imag_data = keepPositiveFreq(imag_data);
     #elif TEST_FUNCTION_FREQ == 2
         data = filter(data);
     #elif TEST_FUNCTION_FREQ == 3
@@ -131,10 +134,21 @@ void testCodeFreq(struct signal data){
     #endif
 
     /* Print data to text file to compare with Matlab */
+    #if TEST_FUNCTION_FREQ == 1
+    FILE *realDataOut;
+    FILE *imagDataOut;
+    realDataOut = fopen("realDataOut.txt","wb");
+    imagDataOut = fopen("imagDataOut.txt","wb");
+    if(realDataOut == NULL)
+        printf("Cannot create file\n\r");
+    if(imagDataOut == NULL)
+        printf("Cannot create file\n\r");
+    #else
     FILE *dataOut;
     dataOut = fopen("dataOut.txt","wb");
     if(dataOut == NULL)
         printf("Cannot create file\n\r");
+    #endif
 
     #if TEST_FUNCTION_FREQ == 6
         printf("Power value is : %f\n\r", Power);
@@ -145,8 +159,15 @@ void testCodeFreq(struct signal data){
         printf("Interpolated left value and index: %f %d\n\r", val.left_value, val.left_index);
         printf("Interpolated right value and index: %f %d\n\r", val.right_value, val.right_index);
     #else
+    #if TEST_FUNCTION_FREQ == 1
+    for(uint32_t i=0; i<real_data.length; i++){  
+    #else
     for(uint32_t i=0; i<data.length; i++){
-        #if TEST_FUNCTION_FREQ == 5
+    #endif
+        #if TEST_FUNCTION_FREQ == 1
+            fprintf(realDataOut, "%f\n", real_data.values[i]);
+            fprintf(imagDataOut, "%f\n", imag_data.values[i]);
+        #elif TEST_FUNCTION_FREQ == 5
             fprintf(dataOut, "%f\n", buf[i]);
         #else
             fprintf(dataOut, "%f\n", data.values[i]);
@@ -154,5 +175,10 @@ void testCodeFreq(struct signal data){
     }
     #endif
 
-    fclose(dataOut);
+    #if TEST_FUNCTION_FREQ == 1
+        fclose(realDataOut);
+        fclose(imagDataOut);
+    #else
+        fclose(dataOut);
+    #endif
 }

@@ -136,7 +136,7 @@ int main(void){
 
     #else
 
-    FILE *dataIn;
+    FILE *dataInReal, *dataInImag;
 
     #if TEST == 1
 
@@ -160,23 +160,30 @@ int main(void){
 
     #else
 
-    struct signal data;
-    data.length = FFT_SIZE;
-    data.fs = 6173300;
+    struct signal real_data, imag_data;
+    real_data.length = imag_data.length = FFT_SIZE;
+    real_data.fs = imag_data.fs = 6173300;
 
-    dataIn = fopen("testcode/ADCTesting/750k_fft.bin", "rb");
-    if(!dataIn){
+    dataInReal = fopen("testcode/ADCTesting/750k_fft_real.bin", "rb");
+    dataInImag = fopen("testcode/ADCTesting/750k_fft_imag.bin", "rb");
+    if(!dataInReal){
         printf("Cannot open file\n\r");
         return -1;
     }
-
-    for(uint32_t i=0; i<FFT_SIZE; i++){
-        fread(&data.values[i], sizeof(float), 1, dataIn);
+    if(!dataInImag){
+        printf("Cannot open file\n\r");
+        return -2;
     }
 
-    fclose(dataIn);
+    for(uint32_t i=0; i<FFT_SIZE; i++){
+        fread(&real_data.values[i], sizeof(float), 1, dataInReal);
+        fread(&imag_data.values[i], sizeof(float), 1, dataInImag);
+    }
 
-    testCodeFreq(data);
+    fclose(dataInReal);
+    fclose(dataInImag);
+
+    testCodeFreq(real_data, imag_data);
 
     #endif
 
