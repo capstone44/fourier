@@ -9,7 +9,7 @@
 struct signal keepPositiveFreq(struct signal data);
 
 
-struct signal calculateMagSquared(struct signal real_data, struct signal imag_data);
+struct freq_signal calculateMagSquared(struct signal real_data, struct signal imag_data);
 
 
 struct signal filter(struct signal data);
