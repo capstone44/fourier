@@ -24,17 +24,6 @@ typedef struct signal
     float delta_f;
 }signal;
 
-
-typedef struct freq_signal
-{
-    uint32_t length;
-    uint32_t fs;
-    double values[WINDOW_SIZE];
-    float frequencies[WINDOW_SIZE];
-    float delta_f;
-}freq_signal;
-
-
 /**************************************************************/
 /* Struct that holds all of the info needed for interpolation */
 /* including the index to the left of the interpolated max    */

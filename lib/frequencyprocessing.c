@@ -11,24 +11,24 @@ struct signal keepPositiveFreq(struct signal data){
     return data;
 }
 
-struct freq_signal calculateMagSquared(struct signal real_data, struct signal imag_data){
-    struct freq_signal psdx;
+struct signal calculateMagSquared(struct signal real_data, struct signal imag_data){
+    struct signal psdx;
     psdx.length = real_data.length;
     psdx.fs = real_data.fs;
     uint64_t scaler = (uint64_t) psdx.fs * (uint64_t) psdx.length * 2;
     printf("Size of psdx: %d\n\r", psdx.length*2);
     printf("Sample rate of psdx: %d\n\r", psdx.fs);
     printf("Scaler value: %ld\n\r", scaler);
-    for(uint32_t i=0; i<psdx.length; i++){
+    for(uint32_t i=0; i<psdx.length+1; i++){
         psdx.frequencies[i] = real_data.frequencies[i];
         real_data.values[i] *= real_data.values[i];
         imag_data.values[i] *= imag_data.values[i];
         if(i != 0 && i != psdx.length-1){
-            psdx.values[i] = (double) (real_data.values[i]+imag_data.values[i]) / scaler * 2;
+            psdx.values[i] = 2*(real_data.values[i]+imag_data.values[i])/scaler;
         }
         else
         {
-            psdx.values[i] = (double) (real_data.values[i]+imag_data.values[i])/scaler;
+            psdx.values[i] = (real_data.values[i]+imag_data.values[i])/scaler;
             printf("First or last psdx value: %g\n\r", psdx.values[i]);
         }
     }
@@ -125,7 +125,7 @@ void testCodeFreq(struct signal data){
         real_data = keepPositiveFreq(real_data);
         imag_data = keepPositiveFreq(imag_data);
     #elif TEST_FUNCTION_FREQ == 2
-        struct freq_signal psdx = calculateMagSquared(real_data, imag_data); 
+        struct signal psdx = calculateMagSquared(real_data, imag_data); 
     #elif TEST_FUNCTION_FREQ == 3
         data = filter(data);
     #elif TEST_FUNCTION_FREQ == 4
