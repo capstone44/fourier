@@ -134,7 +134,7 @@ void testCodeFreq(struct signal data){
         float buf[data.length];
         interpolate(data, val, buf);
     #elif TEST_FUNCTION_FREQ == 6
-        float Power = calculatePower(buf, psdx.length, psdx.delta_f);
+        float Power = calculatePower(buf, data.length, data.delta_f);
     #endif
 
     /* Print data to text file to compare with Matlab */
