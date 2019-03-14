@@ -75,7 +75,7 @@ struct max_values findPeak(struct signal psdx){
 }
 
 void interpolate(struct signal psdx, struct max_values val, float *buf){
-    float tmp, P1, P2, P3;
+    float tmp, P1, P2, P3, output;
     float left_freq = psdx.frequencies[val.left_index];
     float right_freq = psdx.frequencies[val.right_index];
     float max_freq = val.actual_max_frequency;
@@ -87,8 +87,10 @@ void interpolate(struct signal psdx, struct max_values val, float *buf){
         P1 = ((tmp-max_freq)*(tmp-right_freq))*left_value/((left_freq-max_freq)*(left_freq-right_freq));
         P2 = ((tmp-left_freq)*(tmp-right_freq))*max_value/((max_freq-left_freq)*(max_freq-right_freq));
         P3 = ((tmp-left_freq)*(tmp-max_freq))*right_value/((right_freq-left_freq)*(right_freq-max_freq));
-        buf[i] = P1 + P2 + P3;
-        if(!buf[i])
+        output = P1 + P2 + P3;
+        if(output)
+            buf[i] = output;
+        else
             buf[i] = 0;
     }
 
