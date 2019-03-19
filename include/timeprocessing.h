@@ -57,8 +57,9 @@ void testCodeTime(uint32_t raw_adc_data[], uint32_t N);
 void testCodeTime(struct signal data);
 #endif
 
-/* May want to create a separate file for this         */
-/* because there are 16,666 floating point values.     */
+/***************************************************************/
+/* Gaussian window weights calculated and exported from Matlab */
+/***************************************************************/
 const static float window_weights[DECIMATED_SIZE] = {
 4.3936933623407420e-02, 
 4.3969900003008447e-02, 

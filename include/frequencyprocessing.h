@@ -6,22 +6,53 @@
 #define FFT_SIZE 32768
 #define POSITIVE_HALF_FFT FFT_SIZE/2 + 1
 
+/***************************************************/
+/* Calculate the frequency resolution of the DFT   */
+/* and keep only the first half of the DFT output. */
+/* Also, create an array that has the actual       */
+/* frequencies that correspond to each DFT bin.    */
+/***************************************************/
 struct signal keepPositiveFreq(struct signal data);
 
-
+/*******************************************************/
+/* Calculate the magnitude squared of the input signal */
+/* from its real and imaginary components.             */
+/*******************************************************/
 struct signal calculateMagSquared(struct signal real_data, struct signal imag_data);
 
-
+/*****************************************************/
+/* The output of the magnitude squared function will */
+/* have several large peaks, one that is especially  */
+/* problematic happens at DC. In order to attenuate  */
+/* the large DC peak and a few others multiply each  */
+/* frequency bin by a weight created in Matlab and   */
+/* stored in a variable initialized in               */
+/* frequencyprocessing.h.                            */
+/*****************************************************/
 struct signal filter(struct signal data);
 
-
+/*******************************************************/
+/* The interpolate function needs the peak value of    */
+/* the DFT with its index and the values directly      */
+/* to the left and right with their indices. It also   */
+/* needs the actual peak found using a parabolic curve */
+/* fit. All of these values are returned for use       */
+/* in the interpolate function.                        */
+/*******************************************************/
 struct max_values findPeak(struct signal psdx);
 
-
+/*********************************************************/
+/* This function iterates over the length of psdx and    */
+/* calculates the interpolated value using lagrangian    */
+/* interpolation. If the interpolated value is negative, */ 
+/* set it to 0.                                          */
+/*********************************************************/
 void interpolate(struct signal psdx, struct max_values val, float *buf);
 
-
-float calculatePower(float *buf, uint32_t N, float delta_f);
+/*************************************************************/
+/* Calculate power using the DFT form of Parseval's Theorem. */
+/*************************************************************/
+float calculatePower(float *buf, uint32_t N);
 
 
 /*************************************************************/
@@ -46,8 +77,10 @@ void testCodeFreq(struct signal data, float *buf);
 void testCodeFreq(struct signal data);
 #endif
 
-/* May want to create a separate file for this         */
-/* because there are 16,384 floating point values.     */
+/***********************************************************/
+/* Magnitude squared of bandpass filter weights calculated */
+/* and exported from Matlab.                               */
+/***********************************************************/
 const static float filter_mag_squared[FFT_SIZE] = {
 6.5485022162830046e-04, 
 6.5461239597655845e-04, 

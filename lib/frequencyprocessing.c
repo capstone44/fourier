@@ -1,5 +1,11 @@
 #include "frequencyprocessing.h"
 
+/***************************************************/
+/* Calculate the frequency resolution of the DFT   */
+/* and keep only the first half of the DFT output. */
+/* Also, create an array that has the actual       */
+/* frequencies that correspond to each DFT bin.    */
+/***************************************************/
 struct signal keepPositiveFreq(struct signal data){
     data.delta_f = (float) data.fs / (float) data.length;
     data.length = data.length/2;
@@ -11,6 +17,18 @@ struct signal keepPositiveFreq(struct signal data){
     return data;
 }
 
+/*******************************************************/
+/* To calculate the magnitude squared, square the real */
+/* and imaginary values and then add them and then     */
+/* scale the output. Since we only have the positive   */
+/* frequencies we need to double all all of the values */
+/* to account for (an assumed) symmetric negative      */
+/* frequency composition. The first and last values    */
+/* do not have a negative frequency equivalent and are */
+/* thus left alone. The new frequency array will be    */
+/* same as both of the real and imaginary frequency    */
+/* arrays.                                             */
+/*******************************************************/
 struct signal calculateMagSquared(struct signal real_data, struct signal imag_data){
     struct signal psdx;
     psdx.length = real_data.length;
@@ -32,6 +50,15 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
     return psdx;
 }
 
+/*****************************************************/
+/* The output of the magnitude squared function will */
+/* have several large peaks, one that is especially  */
+/* problematic happens at DC. In order to attenuate  */
+/* the large DC peak and a few others multiply each  */
+/* frequency bin by a weight created in Matlab and   */
+/* stored in a variable initialized in               */
+/* frequencyprocessing.h.                            */
+/*****************************************************/
 struct signal filter(struct signal data){
     for(uint32_t i=0; i<data.length; i++){
         data.values[i] *= filter_mag_squared[i];
@@ -39,6 +66,20 @@ struct signal filter(struct signal data){
     return data;
 }
 
+/*******************************************************/
+/* The interpolate function needs the peak value of    */
+/* the DFT with its index and the values directly      */
+/* to the left and right with their indices. This      */
+/* function will iterate through the psdx data and     */
+/* keeps track of the current max value and its        */
+/* index, if it comes across a larger value, they      */
+/* are updated. After iterating through the data,      */
+/* the left and right indices are calculated from      */
+/* the max index, which are then used to calculate     */
+/* their data values. The true max value and           */
+/* frequency are then calculated using a parabolic     */
+/* curve fit. All values are stored for interpolation. */
+/*******************************************************/
 struct max_values findPeak(struct signal psdx){
     struct max_values val;
     float max_value = 0;
@@ -63,9 +104,13 @@ struct max_values findPeak(struct signal psdx){
     right_index = max_frequency + 1;
     left_value = psdx.values[left_index];
     right_value = psdx.values[right_index];
+
+    /* To better understand this calculation visit the following website:               */
+    /* https://ccrma.stanford.edu/~jos/sasp/Quadratic_Interpolation_Spectral_Peaks.html */
     actual_max_frequency = (left_value - right_value)/(2*(left_value + right_value - 2*max_value));
     actual_max_value = max_value - (left_value - right_value)*actual_max_frequency/4;
     actual_max_frequency += psdx.frequencies[max_frequency];
+
     val.actual_max_frequency = actual_max_frequency;
     val.actual_max_value = actual_max_value;
     val.right_value = right_value;
@@ -75,6 +120,12 @@ struct max_values findPeak(struct signal psdx){
     return val;
 }
 
+/****************************************************************************/
+/* First store all values from the input val into local variables for space */
+/* management. The function will then iterate over the length of psdx and   */
+/* calculate the interpolated value using lagrangian interpolation. If the  */
+/* interpolated value is negative, set it to 0.                             */
+/****************************************************************************/
 void interpolate(struct signal psdx, struct max_values val, float *buf){
     float tmp, P1, P2, P3, output;
     float left_freq = psdx.frequencies[val.left_index];
@@ -85,10 +136,14 @@ void interpolate(struct signal psdx, struct max_values val, float *buf){
     float right_value = val.right_value;
     for(uint32_t i=0; i<psdx.length-1; i++){
         tmp = psdx.frequencies[i];
+
+        /* To better understand this calculation visit the following website: */
+        /* https://www.math.usm.edu/lambers/mat772/fall10/lecture5.pdf        */
         P1 = ((tmp-max_freq)*(tmp-right_freq))*left_value/((left_freq-max_freq)*(left_freq-right_freq));
         P2 = ((tmp-left_freq)*(tmp-right_freq))*max_value/((max_freq-left_freq)*(max_freq-right_freq));
         P3 = ((tmp-left_freq)*(tmp-max_freq))*right_value/((right_freq-left_freq)*(right_freq-max_freq));
         output = P1 + P2 + P3;
+        
         if(output > 0.0)
             buf[i] = output;
         else
@@ -97,16 +152,15 @@ void interpolate(struct signal psdx, struct max_values val, float *buf){
 
 }
 
-float calculatePower(float *buf, uint32_t N, float delta_f){
-    printf("Length : %d\n\r", N);
-    printf("Delta_f : %g\n\r", delta_f);
+/*************************************************************/
+/* Calculate power using the DFT form of Parseval's Theorem. */
+/*************************************************************/
+float calculatePower(float *buf, uint32_t N){
     float P = 0;
-    float scaler = delta_f/2;
-    for(uint32_t i=1; i<=N; i++){
-        if(buf[i] > 0.0)
-            printf("Buffer value : %g\n\r", buf[i]);
-        P += scaler * (buf[i] + buf[i-1]);
+    for(uint32_t i=0; i<N; i++){
+        P += buf[i];
     }
+    P /= N;
     return P;
 }
 
@@ -139,7 +193,7 @@ void testCodeFreq(struct signal data){
         float buf[data.length];
         interpolate(data, val, buf);
     #elif TEST_FUNCTION_FREQ == 6
-        float Power = calculatePower(buf, data.length, data.delta_f);
+        float Power = calculatePower(buf, data.length);
     #endif
 
     /* Print data to text file to compare with Matlab */
