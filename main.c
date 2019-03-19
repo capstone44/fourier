@@ -31,11 +31,12 @@ struct rf_data{
 /* To run normally, set TEST to 0                               */
 /* To run a test on time domain functions, set TEST to 1        */
 /* To run a test on frequency domain functions, set TEST to 2   */
+/* To run a complete test, set TEST to 3                        */
 /****************************************************************/
-#define TEST 2
+#define TEST 3
 
 int main(void){
-    #if !TEST
+    #if TEST == 0
     /*
      * Set up variables for each of the client and server sockets
      */
@@ -133,6 +134,16 @@ int main(void){
         counter++;
     }
     close(client_sock);
+
+    #elif TEST == 3
+
+    FILE *rawDataOut, *preFFTout, *postFFTout;
+    
+    
+
+    fclose(rawDataOut);
+    fclose(preFFTout);
+    fclose(postFFTout);
 
     #else
 
