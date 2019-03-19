@@ -6,13 +6,15 @@ import math
 RawData ="750k.bin"
 f = open(RawData, "r")
 a = np.fromfile(f, dtype=np.uint32)
-t = 2668891
+#t = 2668891
 V = a[:-1].copy()
-T = [ (( x * t ) / ( 1000.0*len(V) )) for x in 2*range(len(V))]
+#T = [ (( x * t ) / ( 1000.0*len(V) )) for x in 2*range(len(V))]
 
 ADC1_GPIO = [9,25,10,22,27,17,18,15,14,24]
 
 ADC2_GPIO = [20,26,16,19,13,12,7,8,11,21]
+
+print(type(20))
 
 ADC1len = len(ADC1_GPIO)
 ADC2len = len(ADC2_GPIO)
@@ -22,6 +24,7 @@ def GetV2(Volts):
     Map = np.zeros((len(V),ADC2len), dtype=np.int)
     for i in range(len(Volts)):
         val = int(V[i])
+        #print("Value of V[i]: ", V[i], "Value of val: ", val)
         SignalZero = 0
         for k in range(ADC2len):
             Map[i][k] = (val & 2**k)/2**k

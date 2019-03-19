@@ -137,10 +137,18 @@ int main(void){
 
     #elif TEST == 3
 
-    FILE *rawDataOut, *preFFTout, *postFFTout;
+    FILE *rawDataOut, *preFFTout, *postFFTout, *rawADCIn;
     
-    
-
+    rawADCIn = fopen("/dev/hsdk","rb");
+    if(!rawADCIn){
+    	printf("Cannot access ADC!\r\n");
+	return -1;
+    }
+    uint32_t raw_adc_data[WINDOW_SIZE/2];
+    for(uint32_t i = 0; i < WINDOW_SIZE/2; i++){
+    	fread(&raw_adc_data[i], sizeof(uint32_t),1,rawADCIn);
+    }
+    fclose(rawADCIn);
     fclose(rawDataOut);
     fclose(preFFTout);
     fclose(postFFTout);
