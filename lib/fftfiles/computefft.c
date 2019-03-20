@@ -36,16 +36,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "gpu_fft.h"
 #include "computefft.h"
 
+/*
 unsigned Microseconds(void) {
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
     return ts.tv_sec*1000000 + ts.tv_nsec/1000;
 }
+*/
 
 struct fft_signal computefft(struct signal data, int log2_N) {
-    int i, j, k, ret, loops, freq, jobs, N, mb = mbox_open();
-    unsigned t[2];
-    double tsq[2];
+    int i, j, k, ret, loops, jobs, N, mb = mbox_open();
+    //unsigned t[2];
+    //double tsq[2];
 
     struct fft_signal fft_out;
     fft_out.real_signal.length = fft_out.imag_signal.length = data.length;
@@ -59,14 +61,6 @@ struct fft_signal computefft(struct signal data, int log2_N) {
 
     N = 1<<log2_N; // FFT length
     ret = gpu_fft_prepare(mb, log2_N, GPU_FFT_FWD, jobs, &fft); // call once
-
-    switch(ret) {
-        case -1: printf("Unable to enable V3D. Please check your firmware is up to date.\n"); return -1;
-        case -2: printf("log2_N=%d not supported.  Try between 8 and 22.\n", log2_N);         return -1;
-        case -3: printf("Out of memory.  Try a smaller batch or increase GPU memory.\n");     return -1;
-        case -4: printf("Unable to map Videocore peripherals into ARM memory space.\n");      return -1;
-        case -5: printf("Can't open libbcm_host.\n");                                         return -1;
-    }
 
     for (k=0; k<loops; k++) {
         for (j=0; j<jobs; j++) {
@@ -85,7 +79,6 @@ struct fft_signal computefft(struct signal data, int log2_N) {
     }
 
     //printf("finished performing fft\n\r");
-    int temp;
 
     for(j=0; j<jobs; j++){
         base = fft->out + j*fft->step;  //output buffer
