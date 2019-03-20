@@ -229,7 +229,7 @@ int main(void){
 
     fclose(rawADCIn);
 
-    struct signal data = reorderData(raw_adc_data, WINDOW_SIZE);
+    signal data = reorderData(raw_adc_data, WINDOW_SIZE);
 
     rawDataOut = fopen("rawDataOut.txt","wb");
     if(rawDataOut == NULL)
