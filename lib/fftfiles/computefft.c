@@ -50,8 +50,6 @@ struct fft_signal computefft(struct signal data, int log2_N) {
     //double tsq[2];
 
     struct fft_signal fft_out;
-    fft_out.real_signal.length = fft_out.imag_signal.length = data.length;
-    fft_out.real_signal.fs = fft_out.imag_signal.fs = data.fs;
 
     struct GPU_FFT_COMPLEX *base;
     struct GPU_FFT *fft;
@@ -60,6 +58,10 @@ struct fft_signal computefft(struct signal data, int log2_N) {
     loops = 1;
 
     N = 1<<log2_N; // FFT length
+
+    fft_out.real_signal.length = fft_out.imag_signal.length = N;
+    fft_out.real_signal.fs = fft_out.imag_signal.fs = data.fs;
+
     gpu_fft_prepare(mb, log2_N, GPU_FFT_FWD, jobs, &fft); // call once
 
     for (k=0; k<loops; k++) {
