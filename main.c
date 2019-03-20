@@ -14,6 +14,7 @@
 #include "globals.h"
 #include "timeprocessing.h"
 #include "frequencyprocessing.h"
+#include "computefft.h"
 
 #define CLIENT_SOCK_PATH "/tmp/power_data.sock" //This is where you send data, you are the client to the python server.
 #define SERVER_SOCK_PATH "/tmp/gui_control.sock" //This is where you receive data, you are the server to the python client.
@@ -35,8 +36,8 @@ struct rf_data{
 /****************************************************************/
 #define TEST 3
 
+#if TEST == 0
 int main(void){
-    #if TEST == 0
     /*
      * Set up variables for each of the client and server sockets
      */
@@ -135,29 +136,12 @@ int main(void){
     }
     close(client_sock);
 
-    #elif TEST == 3
+    return 0;
+}
 
-    FILE *rawDataOut, *preFFTout, *postFFTout, *rawADCIn;
-    
-    rawADCIn = fopen("/dev/hsdk","rb");
-    if(!rawADCIn){
-    	printf("Cannot access ADC!\r\n");
-	return -1;
-    }
-    uint32_t raw_adc_data[WINDOW_SIZE/2];
-    for(uint32_t i = 0; i < WINDOW_SIZE/2; i++){
-    	fread(&raw_adc_data[i], sizeof(uint32_t),1,rawADCIn);
-    }
-    fclose(rawADCIn);
-    fclose(rawDataOut);
-    fclose(preFFTout);
-    fclose(postFFTout);
-
-    #else
-
+#elif TEST == 1
+int main(void){
     FILE *dataInReal, *dataInImag;
-
-    #if TEST == 1
 
     uint32_t raw_adc_data[WINDOW_SIZE];
 
@@ -177,7 +161,12 @@ int main(void){
     data = decimateData(data);
     testCodeTime(data);
 
-    #else
+    return 0;
+}
+
+#elif TEST == 2
+int main(void){
+    FILE *dataInReal, *dataInImag;
 
     struct signal real_data, imag_data, psdx;
     struct max_values val;
@@ -212,8 +201,92 @@ int main(void){
     interpolate(psdx, val, buf);
     testCodeFreq(psdx, buf);
 
-    #endif
-
-    #endif
     return 0;
 }
+
+#else
+int main(void){
+    uint32_t raw_adc_data[WINDOW_SIZE/2];
+    struct signal data;
+    struct signal real_data;
+    struct signal imag_data;
+    struct signal psdx;
+    struct fft_signal fft_out;
+    struct max_values val;
+    float buf[FFT_SIZE] = {0};
+    float Power;
+    FILE *rawADCIn, *rawDataOut, *preFFTout, *postFFToutReal, *postFFToutImag;
+    
+    rawADCIn = fopen("/dev/hsdk","rb");
+    if(!rawADCIn){
+    	printf("Cannot access ADC!\r\n");
+	return -1;
+    }
+    
+    for(uint32_t i = 0; i < WINDOW_SIZE/2; i++){
+    	fread(&raw_adc_data[i], sizeof(uint32_t),1,rawADCIn);
+    }
+
+    fclose(rawADCIn);
+
+    struct signal data = reorderData(raw_adc_data, WINDOW_SIZE);
+
+    rawDataOut = fopen("rawDataOut.txt","wb");
+    if(rawDataOut == NULL)
+        printf("Cannot create file\n\r");
+
+    for(uint32_t i=0; i<data.length; i++){
+        fprintf(rawDataOut, "%f\n", data.values[i]);
+    }
+
+    fclose(rawDataOut);
+
+    data = decimateData(data);
+    data = windowData(data);
+
+    preFFTout = fopen("preFFTout.txt","wb");
+    if(preFFTout == NULL)
+        printf("Cannot create file\n\r");
+
+    for(uint32_t i=0; i<data.length; i++){
+        fprintf(preFFTout, "%f\n", data.values[i]);
+    }
+
+    fclose(preFFTout);
+
+    fft_out = computefft(data, LOG_FFT_SIZE);
+    real_data = fft_out.real_signal;
+    imag_data = fft_out.imag_signal;
+
+    postFFToutReal = fopen("postFFToutReal.txt","wb");
+    if(preFFTout == NULL)
+        printf("Cannot create file\n\r");
+
+    for(uint32_t i=0; i<real_data.length; i++){
+        fprintf(postFFToutReal, "%f\n", real_data.values[i]);
+    }
+    postFFToutImag = fopen("postFFToutImag.txt","wb");
+    if(preFFTout == NULL)
+        printf("Cannot create file\n\r");
+
+    for(uint32_t i=0; i<imag_data.length; i++){
+        fprintf(postFFToutImag, "%f\n", imag_data.values[i]);
+    }
+
+    fclose(postFFToutReal);
+    fclose(postFFToutImag);
+
+    real_data = keepPositiveFreq(real_data);
+    imag_data = keepPositiveFreq(imag_data);
+    psdx = calculateMagSquared(real_data, imag_data);
+    psdx = filter(psdx);
+    val = findPeak(psdx);
+    interpolate(psdx, val, buf);
+    Power = calculatePower(buf, data.length);
+
+    printf("Power output: %g\n\r", Power);
+
+    return 0;
+}
+
+#endif

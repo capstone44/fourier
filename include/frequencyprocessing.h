@@ -3,7 +3,6 @@
 
 #include "globals.h"
 
-#define FFT_SIZE 32768
 #define POSITIVE_HALF_FFT FFT_SIZE/2 + 1
 
 /***************************************************/

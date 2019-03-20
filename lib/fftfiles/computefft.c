@@ -42,10 +42,14 @@ unsigned Microseconds(void) {
     return ts.tv_sec*1000000 + ts.tv_nsec/1000;
 }
 
-int computefft(double* signal, int log2_N) {
+struct fft_signal computefft(struct signal data, int log2_N) {
     int i, j, k, ret, loops, freq, jobs, N, mb = mbox_open();
     unsigned t[2];
     double tsq[2];
+
+    struct fft_signal fft_out;
+    fft_out.real_signal.length = fft_out.imag_signal.length = data.length;
+    fft_out.real_signal.fs = fft_out.imag_signal.fs = data.fs;
 
     struct GPU_FFT_COMPLEX *base;
     struct GPU_FFT *fft;
@@ -68,7 +72,7 @@ int computefft(double* signal, int log2_N) {
         for (j=0; j<jobs; j++) {
             base = fft->in + j*fft->step; // input buffer
             for (i=0; i<N; i++){
-                base[i].re = signal[i];
+                base[i].re = data.values[i];
                 base[i].im = 0;
                 //printf("index: %d %0.3lf %0.3lf\n", i, base[i].re, base[i].im);
             }
@@ -86,10 +90,8 @@ int computefft(double* signal, int log2_N) {
     for(j=0; j<jobs; j++){
         base = fft->out + j*fft->step;  //output buffer
 	    for(i=0; i<N; i++){
-            temp = i;
-		    signal[i] = base[i].re;
-	    	i++;
-		    signal[i] = base[i].im;
+		    fft_out.real_signal.values[i] = base[i].re;
+		    fft_out.imag_signal.values[i] = base[i].im;
             //printf("index: %d %0.3lf %0.3lf\n", temp, signal[temp], signal[i]);
 	    }
     }
@@ -97,5 +99,6 @@ int computefft(double* signal, int log2_N) {
     //printf("finished transfer\n\r");
 
     gpu_fft_release(fft); // Videocore memory lost if not freed !
-    return 0;
+
+    return fft_out;
 }

@@ -33,6 +33,9 @@ struct signal windowData(struct signal data);
 /**********************************************/
 struct signal decimateData(struct signal data);
 
+/*  */
+struct signal zeroPad(struct signal data);
+
 /**********************************************/
 /* This function will run one of the above    */
 /* functions and then print the new data to   */

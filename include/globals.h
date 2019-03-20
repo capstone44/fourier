@@ -9,6 +9,8 @@
 #define DECIMATION_FACTOR 3
 #define DECIMATED_SIZE WINDOW_SIZE/DECIMATION_FACTOR
 #define ADC_LENGTH 10
+#define FFT_SIZE 32768
+#define LOG_FFT_SIZE 15
 
 /**************************************************************/
 /* Struct that holds all of the info for data being processed */
@@ -23,6 +25,12 @@ typedef struct signal
     float frequencies[WINDOW_SIZE];
     float delta_f;
 }signal;
+
+typedef struct fft_signal
+{
+    signal real_signal;
+    signal imag_signal;
+}
 
 /**************************************************************/
 /* Struct that holds all of the info needed for interpolation */

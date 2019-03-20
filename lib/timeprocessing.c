@@ -128,6 +128,14 @@ struct signal decimateData(struct signal data){
     return data;
 }
 
+struct signal zeroPad(struct signal data){
+    uint16_t N = data.length;
+    data.length = FFT_SIZE;
+    for(uint32_t i = N; i<data.length; i++)
+        data.values[i] = 0;
+    return data;
+}
+
 /**************************************************/
 /* This test code is controlled by the #define in */
 /* timeprocessing.h, it will run whichever        */
