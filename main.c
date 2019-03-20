@@ -229,7 +229,7 @@ int main(void){
 
     fclose(rawADCIn);
 
-    signal data = reorderData(raw_adc_data, WINDOW_SIZE);
+    data = reorderData(raw_adc_data, WINDOW_SIZE);
 
     rawDataOut = fopen("rawDataOut.txt","wb");
     if(rawDataOut == NULL)
