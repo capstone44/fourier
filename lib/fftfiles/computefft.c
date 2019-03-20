@@ -45,7 +45,7 @@ unsigned Microseconds(void) {
 */
 
 struct fft_signal computefft(struct signal data, int log2_N) {
-    int i, j, k, ret, loops, jobs, N, mb = mbox_open();
+    int i, j, k, loops, jobs, N, mb = mbox_open();
     //unsigned t[2];
     //double tsq[2];
 
@@ -60,7 +60,7 @@ struct fft_signal computefft(struct signal data, int log2_N) {
     loops = 1;
 
     N = 1<<log2_N; // FFT length
-    ret = gpu_fft_prepare(mb, log2_N, GPU_FFT_FWD, jobs, &fft); // call once
+    gpu_fft_prepare(mb, log2_N, GPU_FFT_FWD, jobs, &fft); // call once
 
     for (k=0; k<loops; k++) {
         for (j=0; j<jobs; j++) {
