@@ -30,7 +30,7 @@ typedef struct fft_signal
 {
     signal real_signal;
     signal imag_signal;
-}
+}fft_signal;
 
 /**************************************************************/
 /* Struct that holds all of the info needed for interpolation */
