@@ -4,7 +4,7 @@ import smbus
 channel = 1
 
 #  MCP4725 defaults to address 0x60
-address = 0x76
+address = 0x4C
 
 # Register addresses (with "normal mode" power-down bits)
 reg_write_dac = 0x12 # 0b00010010 = This writes to the second output port on the DAC
