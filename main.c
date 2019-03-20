@@ -206,7 +206,7 @@ int main(void){
 
 #else
 int main(void){
-    uint32_t raw_adc_data[WINDOW_SIZE/2];
+    //uint32_t raw_adc_data[WINDOW_SIZE/2];
     struct signal data;
     struct signal real_data;
     struct signal imag_data;
@@ -215,8 +215,8 @@ int main(void){
     struct max_values val;
     float buf[FFT_SIZE] = {0};
     float Power;
-    FILE *rawADCIn, *rawDataOut, *preFFTout, *postFFToutReal, *postFFToutImag;
-    
+    FILE *rawADCIn, *rawDataOut, *preFFTout, *postFFToutReal, *postFFToutImag,*dataIn;
+/*    
     rawADCIn = fopen("/dev/hsdk","rb");
     if(!rawADCIn){
     	printf("Cannot access ADC!\r\n");
@@ -228,6 +228,21 @@ int main(void){
     }
 
     fclose(rawADCIn);
+*/
+    uint32_t raw_adc_data[WINDOW_SIZE];
+
+    dataIn = fopen("testcode/ADCTesting/750k.bin", "rb");
+    if(!dataIn){
+        printf("Cannot open file\n\r");
+        return -1;
+    }
+
+    for(uint32_t i=0; i<WINDOW_SIZE; i++){
+        fread(&raw_adc_data[i], sizeof(uint32_t), 1, dataIn);
+    }
+
+    fclose(dataIn);
+
 
     data = reorderData(raw_adc_data, WINDOW_SIZE);
 
