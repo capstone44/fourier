@@ -291,8 +291,8 @@ int main(void){
     fclose(postFFToutReal);
     fclose(postFFToutImag);
 
-    //real_data = keepPositiveFreq(real_data);
-    //imag_data = keepPositiveFreq(imag_data);
+    real_data = keepPositiveFreq(real_data);
+    imag_data = keepPositiveFreq(imag_data);
     psdx = calculateMagSquared(real_data, imag_data);
     psdx = filter(psdx);
     val = findPeak(psdx);
