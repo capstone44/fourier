@@ -342,16 +342,16 @@ int main(void){
     real_data = keepPositiveFreq(real_data);
     imag_data = keepPositiveFreq(imag_data);
     psdx = calculateMagSquared(real_data, imag_data);
-    //for(uint32_t i=0; i<psdx.length; i++){
-	//fprintf(outFile, "%g\n", psdx.values[i]);
-    //}
-    psdx = filter(psdx);
-    val = findPeak(psdx);
-   
-    
     for(uint32_t i=0; i<psdx.length; i++){
 	fprintf(outFile, "%g\n", psdx.values[i]);
     }
+    psdx = filter(psdx);
+    val = findPeak(psdx);
+   
+    /*
+    for(uint32_t i=0; i<psdx.length; i++){
+	fprintf(outFile, "%g\n", psdx.values[i]);
+    }*/
     interpolate(psdx, val, buf);
     Power = calculatePower(buf, data.length);
 
