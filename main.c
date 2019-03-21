@@ -330,6 +330,9 @@ int main(void){
     fclose(postFFToutImag);
 
     psdx = calculateMagSquared(real_data, imag_data);
+    for(uint32_t i=0; i<real_data.length; i++){
+        fprintf(outFile, "%g\n", real_data.values[i]);
+    }
     psdx = filter(psdx);
     val = findPeak(psdx);
     interpolate(psdx, val, buf);
