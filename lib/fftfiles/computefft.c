@@ -44,7 +44,8 @@ unsigned Microseconds(void) {
 }
 */
 
-struct fft_signal computefft(struct signal data, int log2_N) {
+struct fft_signal computefft(struct signal data, int log2_N)
+{
     int i, j, k, loops, jobs, N, mb = mbox_open();
     //unsigned t[2];
     //double tsq[2];
@@ -57,38 +58,42 @@ struct fft_signal computefft(struct signal data, int log2_N) {
     jobs = 1;
     loops = 1;
 
-    N = 1<<log2_N; // FFT length
+    N = 1 << log2_N; // FFT length
 
     fft_out.real_signal.length = fft_out.imag_signal.length = N;
     fft_out.real_signal.fs = fft_out.imag_signal.fs = data.fs;
 
     gpu_fft_prepare(mb, log2_N, GPU_FFT_FWD, jobs, &fft); // call once
 
-    for (k=0; k<loops; k++) {
-        for (j=0; j<jobs; j++) {
-            base = fft->in + j*fft->step; // input buffer
-            for (i=0; i<N; i++){
+    for (k = 0; k < loops; k++)
+    {
+        for (j = 0; j < jobs; j++)
+        {
+            base = fft->in + j * fft->step; // input buffer
+            for(i = 0; i< j+1; i++)
+                base[i].re = base[i].im = 0;
+            for (i = 0; i < N; i++)
+            {
                 base[i].re = data.values[i];
                 base[i].im = 0;
                 //printf("index: %d %0.3lf %0.3lf\n", i, base[i].re, base[i].im);
             }
             //printf("finished writing to fft\n\r");
+
+            usleep(1); // Yield to OS
+            //t[0] = Microseconds();
+            gpu_fft_execute(fft); // call one or many times
+            //t[1] = Microseconds();
+            //printf("finished performing fft\n\r");
+
+            base = fft->out + j * fft->step; //output buffer
+            for (i = 0; i < N; i++)
+            {
+                fft_out.real_signal.values[i] = base[i].re;
+                fft_out.imag_signal.values[i] = base[i].im;
+                //printf("index: %d %0.3lf %0.3lf\n", temp, signal[temp], signal[i]);
+            }
         }
-        usleep(1); // Yield to OS
-        //t[0] = Microseconds();
-        gpu_fft_execute(fft); // call one or many times
-        //t[1] = Microseconds();
-    }
-
-    //printf("finished performing fft\n\r");
-
-    for(j=0; j<jobs; j++){
-        base = fft->out + j*fft->step;  //output buffer
-	    for(i=0; i<N; i++){
-		    fft_out.real_signal.values[i] = base[i].re;
-		    fft_out.imag_signal.values[i] = base[i].im;
-            //printf("index: %d %0.3lf %0.3lf\n", temp, signal[temp], signal[i]);
-	    }
     }
 
     //printf("finished transfer\n\r");

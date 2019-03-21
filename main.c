@@ -339,8 +339,8 @@ int main(void){
     fclose(postFFToutReal);
     fclose(postFFToutImag);
 
-    //real_data = keepPositiveFreq(real_data);
-    //imag_data = keepPositiveFreq(imag_data);
+    real_data = keepPositiveFreq(real_data);
+    imag_data = keepPositiveFreq(imag_data);
     psdx = calculateMagSquared(real_data, imag_data);
     //for(uint32_t i=0; i<psdx.length; i++){
 	//fprintf(outFile, "%g\n", psdx.values[i]);
