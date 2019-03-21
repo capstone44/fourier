@@ -212,7 +212,6 @@ int main(void){
     struct signal real_data;
     struct signal imag_data;
     struct signal psdx;
-    //struct fft_signal fft_out;
     struct max_values val;
     double buf[FFT_SIZE] = {0};
     double Power;
@@ -244,7 +243,6 @@ int main(void){
     }
 
     fclose(dataIn);
-
 
     data = reorderData(raw_adc_data, WINDOW_SIZE);
 
@@ -285,9 +283,6 @@ int main(void){
     }
 
     fftw_execute(plan);
-    
-    //for(uint32_t i=0; i<data.length; i++){
-	
 
     imag_data.values[0] = 0;
     for(uint32_t i=0; i<data.length/2+1; i++){
@@ -301,29 +296,24 @@ int main(void){
     imag_data.values[0] = 0;
 
     real_data.length = data.length/2;
-    imag_data.length = data.length/2;	//TODO These are probable wrong, need to check the output of data to find where the imaginary begins.
+    imag_data.length = data.length/2;
  
     real_data.fs = imag_data.fs = 6173300;
 
     //when using this in real application save plan through fftw_export_wisdome_to_filename(const char *filename);
     fftw_destroy_plan(plan);
     fftw_free(in); fftw_free(out);
-
-    //fft_out = computefft(data, LOG_FFT_SIZE);
-    //real_data = fft_out.real_signal;
-    //imag_data = fft_out.imag_signal;
-
     
     FILE *outFile;
     outFile = fopen("out.txt","wb");
-    if(outFile == NULL)
-	printf("Cannot create file\n\r");
-    /*for(uint32_t i=0; i<data.length; i++)
-	fprintf(outFile, "%g\n", data.values[i]);
-    */
+    if(outFile == NULL){
+	    printf("Cannot create file\n\r");
+    }
+
     postFFToutReal = fopen("postFFToutReal.txt","wb");
-    if(preFFTout == NULL)
+    if(preFFTout == NULL){
         printf("Cannot create file\n\r");
+    }
     
     for(uint32_t i=0; i<real_data.length; i++){
         fprintf(postFFToutReal, "%g\n", real_data.values[i]);
@@ -342,16 +332,8 @@ int main(void){
     real_data = keepPositiveFreq(real_data);
     imag_data = keepPositiveFreq(imag_data);
     psdx = calculateMagSquared(real_data, imag_data);
-    for(uint32_t i=0; i<psdx.length; i++){
-	fprintf(outFile, "%g\n", psdx.values[i]);
-    }
     psdx = filter(psdx);
     val = findPeak(psdx);
-   
-    /*
-    for(uint32_t i=0; i<psdx.length; i++){
-	fprintf(outFile, "%g\n", psdx.values[i]);
-    }*/
     interpolate(psdx, val, buf);
     Power = calculatePower(buf, data.length);
 

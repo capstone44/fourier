@@ -1,22 +1,5 @@
 #include "frequencyprocessing.h"
 
-/***************************************************/
-/* Calculate the frequency resolution of the DFT   */
-/* and keep only the first half of the DFT output. */
-/* Also, create an array that has the actual       */
-/* frequencies that correspond to each DFT bin.    */
-/***************************************************/
-struct signal keepPositiveFreq(struct signal data){
-    data.delta_f = (double) data.fs / (double) data.length;
-    data.length = data.length/2;
-    uint32_t j = 0;
-    for(uint32_t i=0; i<data.length; i++){
-        j = i*data.delta_f;
-        data.frequencies[i] = j;
-    }
-    return data;
-}
-
 /*******************************************************/
 /* To calculate the magnitude squared, square the real */
 /* and imaginary values and then add them and then     */

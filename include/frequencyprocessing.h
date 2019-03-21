@@ -5,14 +5,6 @@
 
 #define POSITIVE_HALF_FFT FFT_SIZE/2 + 1
 
-/***************************************************/
-/* Calculate the frequency resolution of the DFT   */
-/* and keep only the first half of the DFT output. */
-/* Also, create an array that has the actual       */
-/* frequencies that correspond to each DFT bin.    */
-/***************************************************/
-struct signal keepPositiveFreq(struct signal data);
-
 /*******************************************************/
 /* Calculate the magnitude squared of the input signal */
 /* from its real and imaginary components.             */
@@ -80,7 +72,7 @@ void testCodeFreq(struct signal data);
 /* Magnitude squared of bandpass filter weights calculated */
 /* and exported from Matlab.                               */
 /***********************************************************/
-const static double filter_mag_squared[FFT_SIZE] = {
+const static double filter_mag_squared[POSITIVE_HALF_FFT] = {
 6.5485022162830046e-04, 
 6.5461239597655845e-04, 
 6.5389922282635025e-04, 
