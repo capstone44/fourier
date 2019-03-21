@@ -331,7 +331,7 @@ int main(void){
 
     psdx = calculateMagSquared(real_data, imag_data);
     for(uint32_t i=0; i<real_data.length; i++){
-        fprintf(outFile, "%g\n", real_data.values[i]);
+        fprintf(outFile, "%g\n", psdx.values[i]);
     }
     psdx = filter(psdx);
     val = findPeak(psdx);
