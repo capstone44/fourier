@@ -14,7 +14,8 @@
 #include "globals.h"
 #include "timeprocessing.h"
 #include "frequencyprocessing.h"
-#include "computefft.h"
+#include </usr/local/include/fftw3.h>
+//#include "computefft.h"
 
 #define CLIENT_SOCK_PATH "/tmp/power_data.sock" //This is where you send data, you are the client to the python server.
 #define SERVER_SOCK_PATH "/tmp/gui_control.sock" //This is where you receive data, you are the server to the python client.
@@ -24,7 +25,7 @@
 #define PI 3.14159265 //For quick demos sake
 
 struct rf_data{
-    float data;
+    double data;
     int16_t angle;
 };
 
@@ -57,8 +58,8 @@ int main(void){
     struct signal imag_data;
     struct signal psdx;
     struct max_values values_for_interpolate;
-    float buf[DECIMATED_SIZE] = {0};
-    float power = 0;
+    double buf[DECIMATED_SIZE] = {0};
+    double power = 0;
     int counter = 0;
 
     /*
@@ -185,8 +186,8 @@ int main(void){
     }
 
     for(uint32_t i=0; i<FFT_SIZE; i++){
-        fread(&real_data.values[i], sizeof(float), 1, dataInReal);
-        fread(&imag_data.values[i], sizeof(float), 1, dataInImag);
+        fread(&real_data.values[i], sizeof(double), 1, dataInReal);
+        fread(&imag_data.values[i], sizeof(double), 1, dataInImag);
     }
 
     fclose(dataInReal);
@@ -197,7 +198,7 @@ int main(void){
     psdx = calculateMagSquared(real_data, imag_data);
     psdx = filter(psdx);
     val = findPeak(psdx);
-    float buf[psdx.length];
+    double buf[psdx.length];
     interpolate(psdx, val, buf);
     testCodeFreq(psdx, buf);
 
@@ -211,11 +212,12 @@ int main(void){
     struct signal real_data;
     struct signal imag_data;
     struct signal psdx;
-    struct fft_signal fft_out;
+    //struct fft_signal fft_out;
     struct max_values val;
-    float buf[FFT_SIZE] = {0};
-    float Power;
-    FILE *rawADCIn, *rawDataOut, *preFFTout, *postFFToutReal, *postFFToutImag,*dataIn;
+    double buf[FFT_SIZE] = {0};
+    double Power;
+    //FILE *rawADCIn, 
+    FILE *rawDataOut, *preFFTout, *postFFToutReal, *postFFToutImag,*dataIn;
 /*    
     rawADCIn = fopen("/dev/hsdk","rb");
     if(!rawADCIn){
@@ -251,41 +253,87 @@ int main(void){
         printf("Cannot create file\n\r");
 
     for(uint32_t i=0; i<data.length; i++){
-        fprintf(rawDataOut, "%f\n", data.values[i]);
+        fprintf(rawDataOut, "%g\n", data.values[i]);
     }
 
     fclose(rawDataOut);
 
     data = decimateData(data);
     data = windowData(data);
+    data = zeroPad(data);
 
     preFFTout = fopen("preFFTout.txt","wb");
     if(preFFTout == NULL)
         printf("Cannot create file\n\r");
 
     for(uint32_t i=0; i<data.length; i++){
-        fprintf(preFFTout, "%f\n", data.values[i]);
+        fprintf(preFFTout, "%g\n", data.values[i]);
     }
 
     fclose(preFFTout);
 
-    fft_out = computefft(data, LOG_FFT_SIZE);
-    real_data = fft_out.real_signal;
-    imag_data = fft_out.imag_signal;
+    double *in;
+    double *out;
+    fftw_plan plan;
 
+    in = (double*) fftw_malloc(sizeof(double) * data.length);
+    out = (double*) fftw_malloc(sizeof(double) * data.length);
+    plan = fftw_plan_r2r_1d(data.length, in, out, FFTW_R2HC, FFTW_MEASURE);
+
+    for(uint32_t i=0; i<data.length; i++){
+    	in[i] = data.values[i];
+    }
+
+    fftw_execute(plan);
+    
+    //for(uint32_t i=0; i<data.length; i++){
+	
+
+    imag_data.values[0] = 0;
+    for(uint32_t i=0; i<data.length/2+1; i++){
+	real_data.values[i] = out[i];
+    }
+    uint32_t j=data.length-1;
+    for(uint32_t i=1; i<data.length/2; i++){
+	imag_data.values[i] = out[j];
+	j--;
+    }
+    imag_data.values[0] = 0;
+
+    real_data.length = data.length/2;
+    imag_data.length = data.length/2;	//TODO These are probable wrong, need to check the output of data to find where the imaginary begins.
+ 
+    real_data.fs = imag_data.fs = 6173300;
+
+    //when using this in real application save plan through fftw_export_wisdome_to_filename(const char *filename);
+    fftw_destroy_plan(plan);
+    fftw_free(in); fftw_free(out);
+
+    //fft_out = computefft(data, LOG_FFT_SIZE);
+    //real_data = fft_out.real_signal;
+    //imag_data = fft_out.imag_signal;
+
+    
+    FILE *outFile;
+    outFile = fopen("out.txt","wb");
+    if(outFile == NULL)
+	printf("Cannot create file\n\r");
+    /*for(uint32_t i=0; i<data.length; i++)
+	fprintf(outFile, "%g\n", data.values[i]);
+    */
     postFFToutReal = fopen("postFFToutReal.txt","wb");
     if(preFFTout == NULL)
         printf("Cannot create file\n\r");
-
+    
     for(uint32_t i=0; i<real_data.length; i++){
-        fprintf(postFFToutReal, "%f\n", real_data.values[i]);
+        fprintf(postFFToutReal, "%g\n", real_data.values[i]);
     }
     postFFToutImag = fopen("postFFToutImag.txt","wb");
     if(preFFTout == NULL)
         printf("Cannot create file\n\r");
 
     for(uint32_t i=0; i<imag_data.length; i++){
-        fprintf(postFFToutImag, "%f\n", imag_data.values[i]);
+        fprintf(postFFToutImag, "%g\n", imag_data.values[i]);
     }
 
     fclose(postFFToutReal);
@@ -294,12 +342,22 @@ int main(void){
     //real_data = keepPositiveFreq(real_data);
     //imag_data = keepPositiveFreq(imag_data);
     psdx = calculateMagSquared(real_data, imag_data);
+    //for(uint32_t i=0; i<psdx.length; i++){
+	//fprintf(outFile, "%g\n", psdx.values[i]);
+    //}
     psdx = filter(psdx);
     val = findPeak(psdx);
+   
+    
+    for(uint32_t i=0; i<psdx.length; i++){
+	fprintf(outFile, "%g\n", psdx.values[i]);
+    }
     interpolate(psdx, val, buf);
     Power = calculatePower(buf, data.length);
 
     printf("Power output: %g\n\r", Power);
+
+    fclose(outFile);
 
     return 0;
 }

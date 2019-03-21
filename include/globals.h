@@ -21,9 +21,9 @@ typedef struct signal
 {
     uint32_t length;
     uint32_t fs;
-    float values[WINDOW_SIZE];
-    float frequencies[WINDOW_SIZE];
-    float delta_f;
+    double values[WINDOW_SIZE];
+    double frequencies[WINDOW_SIZE];
+    double delta_f;
 }signal;
 
 typedef struct fft_signal
@@ -45,10 +45,10 @@ typedef struct max_values
 {
     uint32_t left_index;
     uint32_t right_index;
-    float actual_max_value;
-    float actual_max_frequency;
-    float left_value;
-    float right_value;
+    double actual_max_value;
+    double actual_max_frequency;
+    double left_value;
+    double right_value;
 }max_values;
 
 /* THE FUNCTION BELOW IS NOT ACTUALLY USED, BUT WILL BE KEPT FOR FUTURE EXPANSION IF NEEDED */

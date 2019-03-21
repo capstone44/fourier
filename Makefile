@@ -28,7 +28,7 @@ CFLAGS = -Wall -g
 
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I./include -I./lib/fftfiles
+INCLUDES = -I./include
 
 # define library paths in addition to /usr/lib
 #   if I wanted to include libraries not in /usr/lib I'd specify
@@ -38,12 +38,12 @@ LFLAGS = -L./lib
 # define any libraries to link into executable:
 #   if I want to link in libraries (libx.so or libx.a) I use the -llibname
 #   option, something like (this will link in libmylib.so and libm.so:
-LIBS = -lm -lrt -ldl
+LIBS = -lfftw3 -lm -lrt -ldl
 
 # define the C source files
 FFTLIBS = lib/fftfiles
 S = $(FFTLIBS)/($SS)
-SRCS = main.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c $(FFTLIBS)/mailbox.c $(FFTLIBS)/gpu_fft.c $(FFTLIBS)/gpu_fft_base.c $(FFTLIBS)/gpu_fft_twiddles.c $(FFTLIBS)/gpu_fft_shaders.c $(FFTLIBS)/computefft.c
+SRCS = main.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c
 
 # define the C object files
 #
@@ -85,7 +85,7 @@ $(MAIN): $(OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $(ODIR)/$@
 
 clean:
-	$(RM) $(ODIR)/*.o $(ODIR)/*~ $(ODIR)/$(MAIN) $(ODIR)/lib/*.o
+	$(RM) $(ODIR)/*.o $(ODIR)/*~ $(ODIR)/$(MAIN) $(ODIR)/lib/*.o *.txt
 
 depend: $(SRCS)
 	makedepend $(INCLUDES) $^

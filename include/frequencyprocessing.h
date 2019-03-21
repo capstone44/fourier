@@ -46,12 +46,12 @@ struct max_values findPeak(struct signal psdx);
 /* interpolation. If the interpolated value is negative, */ 
 /* set it to 0.                                          */
 /*********************************************************/
-void interpolate(struct signal psdx, struct max_values val, float *buf);
+void interpolate(struct signal psdx, struct max_values val, double *buf);
 
 /*************************************************************/
 /* Calculate power using the DFT form of Parseval's Theorem. */
 /*************************************************************/
-float calculatePower(float *buf, uint32_t N);
+double calculatePower(double *buf, uint32_t N);
 
 
 /*************************************************************/
@@ -71,7 +71,7 @@ void testCodeFreq(struct signal real_data, struct signal imag_data);
 #elif TEST_FUNCTION_FREQ == 5
 void testCodeFreq(struct signal data, struct max_values val);
 #elif TEST_FUNCTION_FREQ == 6
-void testCodeFreq(struct signal data, float *buf);
+void testCodeFreq(struct signal data, double *buf);
 #else
 void testCodeFreq(struct signal data);
 #endif
@@ -80,7 +80,7 @@ void testCodeFreq(struct signal data);
 /* Magnitude squared of bandpass filter weights calculated */
 /* and exported from Matlab.                               */
 /***********************************************************/
-const static float filter_mag_squared[FFT_SIZE] = {
+const static double filter_mag_squared[FFT_SIZE] = {
 6.5485022162830046e-04, 
 6.5461239597655845e-04, 
 6.5389922282635025e-04, 

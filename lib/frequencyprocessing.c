@@ -7,7 +7,7 @@
 /* frequencies that correspond to each DFT bin.    */
 /***************************************************/
 struct signal keepPositiveFreq(struct signal data){
-    data.delta_f = (float) data.fs / (float) data.length;
+    data.delta_f = (double) data.fs / (double) data.length;
     data.length = data.length/2;
     uint32_t j = 0;
     for(uint32_t i=0; i<data.length; i++){
@@ -82,15 +82,15 @@ struct signal filter(struct signal data){
 /*******************************************************/
 struct max_values findPeak(struct signal psdx){
     struct max_values val;
-    float max_value = 0;
-    float left_value;
-    float right_value;
-    float actual_max_value;
-    float actual_max_frequency;
+    double max_value = 0;
+    double left_value;
+    double right_value;
+    double actual_max_value;
+    double actual_max_frequency;
     uint32_t max_frequency;
     uint32_t left_index;
     uint32_t right_index;
-    float tmp;
+    double tmp;
 
     for(uint32_t i=0; i<psdx.length; i++){
         tmp = psdx.values[i];
@@ -126,14 +126,14 @@ struct max_values findPeak(struct signal psdx){
 /* calculate the interpolated value using lagrangian interpolation. If the  */
 /* interpolated value is negative, set it to 0.                             */
 /****************************************************************************/
-void interpolate(struct signal psdx, struct max_values val, float *buf){
-    float tmp, P1, P2, P3, output;
-    float left_freq = psdx.frequencies[val.left_index];
-    float right_freq = psdx.frequencies[val.right_index];
-    float max_freq = val.actual_max_frequency;
-    float max_value = val.actual_max_value;
-    float left_value = val.left_value;
-    float right_value = val.right_value;
+void interpolate(struct signal psdx, struct max_values val, double *buf){
+    double tmp, P1, P2, P3, output;
+    double left_freq = psdx.frequencies[val.left_index];
+    double right_freq = psdx.frequencies[val.right_index];
+    double max_freq = val.actual_max_frequency;
+    double max_value = val.actual_max_value;
+    double left_value = val.left_value;
+    double right_value = val.right_value;
     for(uint32_t i=0; i<psdx.length-1; i++){
         tmp = psdx.frequencies[i];
 
@@ -155,8 +155,8 @@ void interpolate(struct signal psdx, struct max_values val, float *buf){
 /*************************************************************/
 /* Calculate power using the DFT form of Parseval's Theorem. */
 /*************************************************************/
-float calculatePower(float *buf, uint32_t N){
-    float P = 0;
+double calculatePower(double *buf, uint32_t N){
+    double P = 0;
     for(uint32_t i=0; i<N; i++){
         P += buf[i];
     }
@@ -175,7 +175,7 @@ void testCodeFreq(struct signal real_data, struct signal imag_data){
 #elif TEST_FUNCTION_FREQ == 5
 void testCodeFreq(struct signal data, struct max_values val){
 #elif TEST_FUNCTION_FREQ == 6
-void testCodeFreq(struct signal data, float *buf){
+void testCodeFreq(struct signal data, double *buf){
 #else
 void testCodeFreq(struct signal data){
 #endif
@@ -193,7 +193,7 @@ void testCodeFreq(struct signal data){
         float buf[data.length];
         interpolate(data, val, buf);
     #elif TEST_FUNCTION_FREQ == 6
-        float Power = calculatePower(buf, data.length);
+        double Power = calculatePower(buf, data.length);
     #endif
 
     /* Print data to text file to compare with Matlab */

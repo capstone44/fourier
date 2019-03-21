@@ -25,8 +25,8 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     /* size that will be used to extract and interleave values.     */
     /****************************************************************/
     uint32_t N2 = N/2;
-    float M[N2];
-    float M2[N2];
+    double M[N2];
+    double M2[N2];
 
     /*****************************************************************/
     /* These are variables used to extract the 10 bit number, val    */
@@ -40,7 +40,7 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
     /*****************************************************************/
     uint32_t val, tmp1, tmp2, tmp3;
     uint32_t magnitude, mask1, mask2;
-    float SignalZero1, SignalZero2;
+    double SignalZero1, SignalZero2;
 
     for(uint32_t i=0; i<N2; i++){
         val = raw_adc_data[i];
