@@ -72,7 +72,7 @@ void testCodeFreq(struct signal data);
 /* Magnitude squared of bandpass filter weights calculated */
 /* and exported from Matlab.                               */
 /***********************************************************/
-const static float filter_bins[FFT_SIZE] = {
+const static float filter_mag_squared[FFT_SIZE] = {
 6.5485022162830046e-04, 
 6.5461239597655845e-04, 
 6.5389922282635025e-04, 

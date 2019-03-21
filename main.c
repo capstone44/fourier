@@ -15,7 +15,6 @@
 #include "timeprocessing.h"
 #include "frequencyprocessing.h"
 #include </usr/local/include/fftw3.h>
-//#include "computefft.h"
 
 #define CLIENT_SOCK_PATH "/tmp/power_data.sock" //This is where you send data, you are the client to the python server.
 #define SERVER_SOCK_PATH "/tmp/gui_control.sock" //This is where you receive data, you are the server to the python client.
@@ -297,10 +296,10 @@ int main(void){
 
     real_data.length = data.length/2;
     imag_data.length = data.length/2;
- 
+
     real_data.fs = imag_data.fs = 6173300;
 
-    //when using this in real application save plan through fftw_export_wisdome_to_filename(const char *filename);
+    //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
     fftw_destroy_plan(plan);
     fftw_free(in); fftw_free(out);
     
@@ -330,15 +329,16 @@ int main(void){
     fclose(postFFToutImag);
 
     psdx = calculateMagSquared(real_data, imag_data);
-    for(uint32_t i=0; i<real_data.length; i++){
-        fprintf(outFile, "%g\n", psdx.values[i]);
-    }
     psdx = filter(psdx);
     val = findPeak(psdx);
     interpolate(psdx, val, buf);
-    Power = calculatePower(buf, data.length);
+    for(uint32_t i=0; i<psdx.length; i++){
+        fprintf(outFile, "%g\n", buf[i]);
+    }
+    Power = calculatePower(buf, psdx.length);
 
-    printf("Power output: %g\n\r", Power);
+    printf("psdx fs: %d\n\r", psdx.fs);
+    printf("Power output: %lf\n\r", Power);
 
     fclose(outFile);
 
