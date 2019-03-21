@@ -15,6 +15,8 @@
 #include "timeprocessing.h"
 #include "frequencyprocessing.h"
 #include </usr/local/include/fftw3.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define CLIENT_SOCK_PATH "/tmp/power_data.sock" //This is where you send data, you are the client to the python server.
 #define SERVER_SOCK_PATH "/tmp/gui_control.sock" //This is where you receive data, you are the server to the python client.
@@ -206,7 +208,6 @@ int main(void){
 
 #else
 int main(void){
-    //uint32_t raw_adc_data[WINDOW_SIZE/2];
     struct signal data;
     struct signal real_data;
     struct signal imag_data;
@@ -214,24 +215,14 @@ int main(void){
     struct max_values val;
     double buf[FFT_SIZE] = {0};
     double Power;
-    //FILE *rawADCIn, 
     FILE *rawDataOut, *preFFTout, *postFFToutReal, *postFFToutImag,*dataIn;
-/*    
-    rawADCIn = fopen("/dev/hsdk","rb");
-    if(!rawADCIn){
-    	printf("Cannot access ADC!\r\n");
-	return -1;
-    }
-    
-    for(uint32_t i = 0; i < WINDOW_SIZE/2; i++){
-    	fread(&raw_adc_data[i], sizeof(uint32_t),1,rawADCIn);
-    }
-
-    fclose(rawADCIn);
-*/
     uint32_t raw_adc_data[WINDOW_SIZE];
 
-    dataIn = fopen("testcode/ADCTesting/750k.bin", "rb");
+    system("/bin/cat /dev/hsdk > /tmp/sample.bin");
+    sleep(1);
+    printf("Successfully sampled ADC\r\n");
+
+    dataIn = fopen("/tmp/sample.bin", "rb");
     if(!dataIn){
         printf("Cannot open file\n\r");
         return -1;
@@ -297,12 +288,12 @@ int main(void){
     real_data.length = data.length/2;
     imag_data.length = data.length/2;
 
-    real_data.fs = imag_data.fs = 6173300;
+    real_data.fs = imag_data.fs = 6173300; //~18 MHz is roughly our sampling frequency, this is divided by 3 becasue we have decimated by 3
 
     //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
     fftw_destroy_plan(plan);
     fftw_free(in); fftw_free(out);
-    
+
     FILE *outFile;
     outFile = fopen("out.txt","wb");
     if(outFile == NULL){
@@ -313,7 +304,7 @@ int main(void){
     if(preFFTout == NULL){
         printf("Cannot create file\n\r");
     }
-    
+
     for(uint32_t i=0; i<real_data.length; i++){
         fprintf(postFFToutReal, "%g\n", real_data.values[i]);
     }
@@ -331,6 +322,7 @@ int main(void){
     psdx = calculateMagSquared(real_data, imag_data);
     psdx = filter(psdx);
     val = findPeak(psdx);
+    printf("The peak was found at a frequency of: %lf\r\n", val.actual_max_frequency);
     interpolate(psdx, val, buf);
     for(uint32_t i=0; i<psdx.length; i++){
         fprintf(outFile, "%g\n", buf[i]);
