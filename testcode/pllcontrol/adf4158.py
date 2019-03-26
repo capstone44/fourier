@@ -86,7 +86,7 @@ class ADF4158():
         self.write_value(step=steps)
         self.write_value(dev_offset=dev_offset)
         self.write_value(clk_div_mode=3)
-        self.write_value(ramp_on=1)
+        self.write_value(ramp_on=0) # Turn the ramp on and off
         self.write_value(pd_polarity=1)
         self.write_value(prescaler=1)
         self.write_value(r_counter=1)
@@ -95,7 +95,7 @@ class ADF4158():
         #Readback to muxout and negative bleed current
         #can't be activated simultaneously
         if 1:
-            self.write_value(muxout=15)
+            self.write_value(muxout=6) #This sets muxout to be the Digital Lock Detect
             self.write_value(readback_to_muxout=3)
         else:
             self.write_value(neg_bleed_current=3)

@@ -1,3 +1,3 @@
-/home/pi/ACEcontrol/adcread/scope.ko
-/home/pi/ACEcontrol/adcread/scope.o
+/home/pi/AMS/adc-kernel-mod/scope.ko
+/home/pi/AMS/adc-kernel-mod/scope.o
 

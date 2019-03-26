@@ -14,12 +14,16 @@
 /*******************************************************/
 struct signal calculateMagSquared(struct signal real_data, struct signal imag_data){
     struct signal psdx;
+    double delta_f = (double) real_data.fs / (double) ((real_data.length - 1) * 2);
+    uint32_t j = 0;
+    for(uint32_t i=0; i<real_data.length; i++){
+        j = i*delta_f;
+        psdx.frequencies[i] = j;
+    }
     psdx.length = real_data.length;
     psdx.fs = real_data.fs;
-    psdx.delta_f = real_data.delta_f;
     uint64_t scaler = (uint64_t) psdx.fs * (uint64_t) psdx.length * 2;
     for(uint32_t i=0; i<psdx.length+1; i++){
-        psdx.frequencies[i] = real_data.frequencies[i];
         real_data.values[i] *= real_data.values[i];
         imag_data.values[i] *= imag_data.values[i];
         if(i != 0 && i != psdx.length){
@@ -117,6 +121,7 @@ void interpolate(struct signal psdx, struct max_values val, double *buf){
     double max_value = val.actual_max_value;
     double left_value = val.left_value;
     double right_value = val.right_value;
+
     for(uint32_t i=0; i<psdx.length-1; i++){
         tmp = psdx.frequencies[i];
 
@@ -130,7 +135,7 @@ void interpolate(struct signal psdx, struct max_values val, double *buf){
         if(output > 0.0)
             buf[i] = output;
         else
-            buf[i] = 0;
+            buf[i] = psdx.values[i];
     }
 
 }

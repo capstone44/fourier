@@ -1,1 +1,1 @@
-cmd_/home/pi/ACEcontrol/adcread/scope.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/pi/ACEcontrol/adcread/scope.ko /home/pi/ACEcontrol/adcread/scope.o /home/pi/ACEcontrol/adcread/scope.mod.o ;  true
+cmd_/home/pi/AMS/adc-kernel-mod/scope.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/pi/AMS/adc-kernel-mod/scope.ko /home/pi/AMS/adc-kernel-mod/scope.o /home/pi/AMS/adc-kernel-mod/scope.mod.o ;  true
