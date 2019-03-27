@@ -81,12 +81,10 @@ int main(int argc, char **argv){
     }
 
     fclose(dataIn);
-
     data = reorderData(raw_adc_data, WINDOW_SIZE);
     data = decimateData(data);
     data = windowData(data);
     data = zeroPad(data);
-
     double *in;
     double *out;
     fftw_plan plan;

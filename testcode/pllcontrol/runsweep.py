@@ -6,15 +6,13 @@ import sys
 
 pll = ADF4158()
 
-f0 = 5.8e9
+f0 = 5.7998e9
 bw = 150e6
-tsweep = 1e-3
-tdelay = 2e-3
-
+tsweep = 15.0 #seconds for the whole sweep
 fpd_freq = 10e6 #The PLL's reference is at 10 MHz
+step_size = int(10e6) # Step Size of 1 MHz
 
-real_delay = pll.freq_to_regs(f0, fpd_freq, bw, tsweep, tdelay)
-
+status = pll.freq_to_regs(f0, fpd_freq, bw, tsweep)
 CLK = 11
 MOSI = 10
 CS = 5
@@ -30,8 +28,6 @@ def sendCommand(data, register, clkPin, mosiPin, csPin):
     if (register > 7 or register < 0):
         print "Invalid Register!"
         return
-    # Datasheet says chip select must be pulled high between conversions
-    GPIO.output(csPin, GPIO.HIGH)
 
     # Start the read with both clock and chip select low
     GPIO.output(csPin, GPIO.LOW)
@@ -74,7 +70,7 @@ def sendBits(data, numBits, clkPin, mosiPin):
 if __name__ == '__main__':
         GPIO.setmode(GPIO.BCM)
         setupSpiPins(CLK, MOSI, CS)
-
+        print "Now loading base 5.8 GHz tone registers"
         # Send the commands
         sendCommand(pll.registers[7],7,CLK, MOSI, CS)
         pll.write_value(step_sel=0)
@@ -91,7 +87,26 @@ if __name__ == '__main__':
         sendCommand(pll.registers[1],1,CLK, MOSI, CS)
         sendCommand(pll.registers[0],0,CLK, MOSI, CS)
         sendCommand(pll.registers[0],0,CLK, MOSI, CS)
+        print "Now beginning sweep with bandwidth: 150 MHz around 5.8 GHz"
+        fstart = f0 - (bw/2)
+        fstop = f0 + (bw/2)
+        steps = range(int(fstart), int(fstop), step_size)
+        step_delay = tsweep / len(steps)
+        print "Start Frequency: " + str(fstart)
+        print "Stop Frequency: " + str(fstop)
+        print "Executing " + str(len(steps)) + " steps with " + str(step_delay) + " seconds between them"
+        for i in steps:
+            n = int((i/(fpd_freq)))
+            frac_msb = int( ((i/(fpd_freq)) - n)* (1 << 12) )
+            frac_lsb = int( (((i/(fpd_freq)) - n)*(1 << 12) - frac_msb)*(1 << 13) )
+            pll.write_value(n=n)
+            pll.write_value(frac_msb=frac_msb)
+            pll.write_value(frac_lsb=frac_lsb)
+            sendCommand(pll.registers[1],1,CLK, MOSI, CS)
+            sendCommand(pll.registers[0],0,CLK, MOSI, CS)
+            sendCommand(pll.registers[0],0,CLK, MOSI, CS)
+            time.sleep(step_delay)
 
-
+        print "Finished sweep, cleaning up"
         GPIO.cleanup()
         sys.exit(0)

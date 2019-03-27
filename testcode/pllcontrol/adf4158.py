@@ -8,7 +8,7 @@ class ADF4158():
         # (Register: name: (First bit, Length, [value]))
         self.register_def = {
                 0:{'ramp_on':(31, 1), 'muxout':(27, 4), 'n':(15,12), 'frac_msb':(3, 12)},
-                1:{'reserved1':(28,4), 'frac_lsb':(15, 12), 'reserved2':(3, 12)},
+                1:{'reserved1':(28, 4), 'frac_lsb':(15, 13), 'reserved2':(3, 12)},
                 2:{'reserved3':(29, 3), 'csr_en':(28, 1), 'cp_current':(24, 4), 'reserved4':(23, 1),
                     'prescaler':(22, 1), 'rdiv2':(21, 1), 'reference_doubler':(20, 1),
                     'r_counter':(15, 5), 'clk1_divider':(3, 12)},
@@ -39,12 +39,85 @@ class ADF4158():
                     raise Exception("Duplicate register {}".format(r))
                 keys.append(r)
 
-    def freq_to_regs(self, fstart, fpd_freq, bw, length, delay):
+    def freq_to_regs(self, fcenter, fpd_freq, bw, length):
+        n = int((fcenter/(fpd_freq)))
+        frac_msb = int( ((fcenter/(fpd_freq)) - n)* (1 << 12) )
+        frac_lsb = int( (((fcenter/(fpd_freq)) - n)*(1 << 12) - frac_msb)*(1 << 13) )
+        #print("n = " + str(n))
+        #print("frac_msb = " + str(frac_msb))
+        #print("frac_lsb = " + str(frac_lsb))
+        clk1 = int((fpd_freq*length/(1<<20)) + 1)
+
+        clk1_d = 1
+
+        clk1 = max(clk1, clk1_d)
+
+        self.write_value(clk1_divider=clk1)
+        self.write_value(clk2_divider=1)
+
+        steps = int(fpd_freq*length/clk1)
+
+        devmax = 1 << 15
+        fres = fpd_freq/(1 << 25)
+        fdev = bw/steps
+
+        dev_offset = int(ceil(log(fdev/(fres*devmax), 2)))
+
+        dev_offset = max(dev_offset, 0)
+
+        dev = int(fdev/(fres*(1 << dev_offset)))
+
+        self.write_value(step=steps)
+        self.write_value(n=n)
+        self.write_value(frac_msb=frac_msb)
+        self.write_value(frac_lsb=frac_lsb)
+        self.write_value(cp_current=0)
+        self.write_value(pd_polarity=0)
+        self.write_value(csr_en=0)
+        self.write_value(r_counter=1)
+        self.write_value(prescaler=1)
+        self.write_value(ramp_on=0)
+        self.write_value(rdiv2=0)
+        self.write_value(reference_doubler=0)
+        self.write_value(clk1_divider=0)
+        self.write_value(n_sel=0)
+        self.write_value(sd_reset=0)
+        self.write_value(ramp_mode=0)
+        self.write_value(psk_enable=0)
+        self.write_value(fsk_enable=0)
+        self.write_value(ldp=0)
+        self.write_value(power_down=0)
+        self.write_value(cp_threestate=0)
+        self.write_value(counter_reset=0)
+        self.write_value(le_sel=0)
+        self.write_value(sd_mod_mode=0)
+        self.write_value(clk_div_mode=0)
+        self.write_value(clk2_divider=0)
+        self.write_value(tx_ramp_clk=0)
+        self.write_value(par_ramp=0)
+        self.write_value(interrupt=0)
+        self.write_value(fsk_ramp_en=0)
+        self.write_value(ramp2_en=0)
+        self.write_value(dev_offset=dev_offset)
+        self.write_value(deviation=dev)
+        self.write_value(ramp_del_fl=0)
+        self.write_value(ramp_del=0)
+        self.write_value(del_clk_sel=0)
+        self.write_value(del_start_en=0)
+        self.write_value(delay_start_divider=0)
+        #This sets muxout to be the Digital Lock Detect
+        self.write_value(muxout=6) #15 is frequency readback, 6 is digital lock detect, see datasheet for more options
+        self.write_value(readback_to_muxout=0)
+        self.write_value(neg_bleed_current=3)
+
+        return 0
+
+    def freq_ramp_to_regs(self, fstart, fpd_freq, bw, length, delay):
         self.write_value(rdiv2=1)
 
-        n = int(fstart/fpd_freq)
-        frac_msb = int( ((fstart/fpd_freq) - n)*(1 << 12) )
-        frac_lsb = int( (((fstart/fpd_freq) - n)*(1 << 12) - frac_msb)*(1 << 13) )
+        n = int((fstart/(fpd_freq)))
+        frac_msb = int( ((fstart/(fpd_freq)) - n)* (1 << 12) )
+        frac_lsb = int( (((fstart/(fpd_freq)) - n)*(1 << 12) - frac_msb)*(1 << 13) )
 
         self.write_value(n=n)
         self.write_value(frac_msb=frac_msb)
