@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from array import array
 import scipy.io
 import math
-RawData ="750k.bin"
+RawData ="beat_test.bin"
 f = open(RawData, "r")
 a = np.fromfile(f, dtype=np.uint32)
 #t = 2668891
@@ -60,11 +60,11 @@ for z in range(len(M)):
 
 #scipy.io.savemat('750k.mat', mdict={'data': SigOut})
 
-outfile = open('750k-processed.bin','wb')
+#outfile = open('750k-processed.bin','wb')
 
-array('h',SigOut).tofile(outfile)
+#array('h',SigOut).tofile(outfile)
 
-#plt.figure(figsize=(15,5))
-#plt.plot(SigOut,"b")
-#plt.title("Plots "+RawData+' .')
-#plt.show()
+plt.figure(figsize=(15,5))
+plt.plot(SigOut,"b")
+plt.title("Plots "+RawData+' .')
+plt.show()

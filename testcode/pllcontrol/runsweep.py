@@ -8,7 +8,7 @@ pll = ADF4158()
 
 f0 = 5.7998e9
 bw = 150e6
-tsweep = 15.0 #seconds for the whole sweep
+tsweep = 120.0 #seconds for the whole sweep
 fpd_freq = 10e6 #The PLL's reference is at 10 MHz
 step_size = int(10e6) # Step Size of 1 MHz
 
