@@ -30,7 +30,7 @@ struct rf_data{
     int16_t angle;
 };
 
-int main(int argc, char **argv){
+int main(void){//int argc, char **argv){
     struct signal data;
     struct signal real_data;
     struct signal imag_data;
@@ -66,83 +66,108 @@ int main(int argc, char **argv){
         exit(1);
     }
 
-    system("/bin/cat /dev/hsdk > /tmp/sample.bin");
-    sleep(1);
-    printf("Successfully sampled ADC\r\n");
+    /* FOR TEST PURPOSES */
 
-    dataIn = fopen("/tmp/sample.bin", "rb");
+    dataIn = fopen("/testcode/testData.bin", "rb");
     if(!dataIn){
         printf("Cannot open file\n\r");
         return -1;
     }
+    uint16_t numFiles = 39;
+    uint16_t fileSize = 2000;
+    for(uint16_t j=0; j< numFiles; j++){
+        for(uint32_t i = 0; i<fileSize; i++){
+            fread(&data.values[i], sizeof(double), 1, dataIn);
+            data.values[i] *= 1000;
+        }
+        data.length = fileSize;
 
-    for(uint32_t i=0; i<WINDOW_SIZE; i++){
-        fread(&raw_adc_data[i], sizeof(uint32_t), 1, dataIn);
-    }
+        /* END TEST STUFF */
 
-    fclose(dataIn);
-    data = reorderData(raw_adc_data, WINDOW_SIZE);
-    data = decimateData(data);
-    data = windowData(data);
-    data = zeroPad(data);
-    double *in;
-    double *out;
-    fftw_plan plan;
+        /*
+        system("/bin/cat /dev/hsdk > /tmp/sample.bin");
+        sleep(1);
+        printf("Successfully sampled ADC\r\n");
 
-    in = (double*) fftw_malloc(sizeof(double) * data.length);
-    out = (double*) fftw_malloc(sizeof(double) * data.length);
-    plan = fftw_plan_r2r_1d(data.length, in, out, FFTW_R2HC, FFTW_MEASURE);
+        dataIn = fopen("/tmp/sample.bin", "rb");
+        if(!dataIn){
+            printf("Cannot open file\n\r");
+            return -1;
+        }
 
-    for(uint32_t i=0; i<data.length; i++){
-        in[i] = data.values[i];
-    }
+        for(uint32_t i=0; i<WINDOW_SIZE; i++){
+            fread(&raw_adc_data[i], sizeof(uint32_t), 1, dataIn);
+        }
 
-    fftw_execute(plan);
+        fclose(dataIn);
+        */
 
-    imag_data.values[0] = 0;
-    for(uint32_t i=0; i<data.length/2+1; i++){
-        real_data.values[i] = out[i];
-    }
-    uint32_t j=data.length-1;
-    for(uint32_t i=1; i<data.length/2; i++){
-        imag_data.values[i] = out[j];
-        j--;
-    }
-    imag_data.values[0] = 0;
+        //data = reorderData(raw_adc_data, WINDOW_SIZE);
+        //data = decimateData(data);
+        //data = windowData(data);
+        data = zeroPad(data);
+        double *in;
+        double *out;
+        fftw_plan plan;
 
-    real_data.length = data.length/2;
-    imag_data.length = data.length/2;
+        in = (double*) fftw_malloc(sizeof(double) * data.length);
+        out = (double*) fftw_malloc(sizeof(double) * data.length);
+        if(j == 0){
+            plan = fftw_plan_r2r_1d(data.length, in, out, FFTW_R2HC, FFTW_MEASURE);
+        }
 
-    real_data.fs = imag_data.fs = 6173300; //~18 MHz is roughly our sampling frequency, this is divided by 3 becasue we have decimated by 3
+        for(uint32_t i=0; i<data.length; i++){
+            in[i] = data.values[i];
+        }
 
-    //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
-    fftw_destroy_plan(plan);
-    fftw_free(in); fftw_free(out);
+        fftw_execute(plan);
 
-    psdx = calculateMagSquared(real_data, imag_data);
-    psdx = filter(psdx);
-    val = findPeak(psdx);
-    printf("The peak was found at a frequency of: %lf\r\n", val.actual_max_frequency);
-    interpolate(psdx, val, buf);
-    Power = calculatePower(buf, psdx.length);
-    test_data.data = Power;
-    int intvar = 0;
-    if (sscanf (argv[1], "%i", &intvar) != 1) {
+        imag_data.values[0] = 0;
+        for(uint32_t i=0; i<data.length/2+1; i++){
+            real_data.values[i] = out[i];
+        }
+        uint32_t j=data.length-1;
+        for(uint32_t i=1; i<data.length/2; i++){
+            imag_data.values[i] = out[j];
+            j--;
+        }
+        imag_data.values[0] = 0;
+
+        real_data.length = data.length/2;
+        imag_data.length = data.length/2;
+
+        real_data.fs = imag_data.fs = 1000;//6173300; //~18 MHz is roughly our sampling frequency, this is divided by 3 becasue we have decimated by 3
+
+        //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
+        //fftw_destroy_plan(plan);
+        fftw_free(in); fftw_free(out);
+
+        psdx = calculateMagSquared(real_data, imag_data);
+        psdx = filter(psdx);
+        val = findPeak(psdx);
+        printf("The peak was found at a frequency of: %lf\r\n", val.actual_max_frequency);
+        interpolate(psdx, val, buf);
+        Power = calculatePower(buf, psdx.length);
+        test_data.data = Power;
+        int intvar = 0;
+        if (sscanf (argv[1], "%i", &intvar) != 1) {
             fprintf(stderr, "error - not an integer");
-    }
-    test_data.angle = intvar;
-    printf("Test Data Data is: %f, Test Data Angle is: %d\r\n", test_data.data, test_data.angle);
-    /* Send the data over the client socket to the server */
-    printf("Sending data...\n");
-    rc = send(client_sock, &test_data, BUFF_SIZE, 0);
-    if (rc == -1) {
-        printf("SEND ERROR: %d", rc);
-        close(client_sock);
-        exit(1);
-    }
+        }
+        test_data.angle = intvar;
+        printf("Test Data Data is: %f, Test Data Angle is: %d\r\n", test_data.data, test_data.angle);
+        /* Send the data over the client socket to the server */
+        printf("Sending data...\n");
+        rc = send(client_sock, &test_data, BUFF_SIZE, 0);
+        if (rc == -1) {
+            printf("SEND ERROR: %d", rc);
+            close(client_sock);
+            exit(1);
+        }
 
-    printf("psdx fs: %d\n\r", psdx.fs);
-    printf("Power output: %lf\n\r", Power);
+        printf("psdx fs: %d\n\r", psdx.fs);
+        printf("Power output: %lf\n\r", Power);
+    }
+    fftw_destroy_plan(plan);
 
     return 0;
 }

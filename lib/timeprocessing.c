@@ -130,7 +130,7 @@ struct signal decimateData(struct signal data){
 
 struct signal zeroPad(struct signal data){
     uint16_t N = data.length;
-    data.length = FFT_SIZE;
+    data.length = 2048;//FFT_SIZE;
     for(uint32_t i = N; i<data.length; i++)
         data.values[i] = 0;
     return data;
