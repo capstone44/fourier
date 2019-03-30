@@ -69,7 +69,7 @@ void testCodeFreq(struct signal data);
 #endif
 
 /* THIS FILTER IS ONLY FOR TEST PURPOSES, REMOVE IT LATER */
-const static float filter_mag_squared[FFT_SIZE] = {
+const static float filter_mag_squared[1024] = {
 1.2022192856179891e-09, 
 1.3403885816037883e-10, 
 1.4028062896503183e-09, 
