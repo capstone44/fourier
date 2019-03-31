@@ -20,14 +20,14 @@
 
 #define CLIENT_SOCK_PATH "/tmp/power_data.sock" //This is where you send data, you are the client to the python server.
 #define SERVER_SOCK_PATH "/tmp/gui_control.sock" //This is where you receive data, you are the server to the python client.
-#define BUFF_SIZE 10 //The size of the rf_data struct - used for transmitting the structure
+#define BUFF_SIZE 16 //The size of the rf_data struct - used for transmitting the structure
 #define TEST_RUN_LENGTH 60 //Arbitrary test run length
 
 #define PI 3.14159265 //For quick demos sake
 
 struct rf_data{
     double data;
-    int16_t angle;
+    double angle;
 };
 
 int main(void){//int argc, char **argv){
@@ -39,7 +39,7 @@ int main(void){//int argc, char **argv){
     double buf[FFT_SIZE] = {0};
     double Power;
     FILE *dataIn;
-    uint32_t raw_adc_data[WINDOW_SIZE];
+    //uint32_t raw_adc_data[WINDOW_SIZE];
     struct rf_data test_data;
     int len_client;
     int client_sock;
@@ -68,17 +68,21 @@ int main(void){//int argc, char **argv){
 
     /* FOR TEST PURPOSES */
 
-    dataIn = fopen("/testcode/testData.bin", "rb");
+    dataIn = fopen("testcode/testData.bin", "rb");
     if(!dataIn){
         printf("Cannot open file\n\r");
         return -1;
     }
-    uint16_t numFiles = 39;
+    uint16_t numFiles = 37;
     uint16_t fileSize = 2000;
-    for(uint16_t j=0; j< numFiles; j++){
+    uint32_t totalSize = numFiles * fileSize;
+    double inputArray[totalSize];
+    for(uint32_t i=0; i<totalSize; i++){
+        fread(&inputArray[i], sizeof(double), 1, dataIn);
+    }
+    for(uint16_t k=0; k<numFiles; k++){
         for(uint32_t i = 0; i<fileSize; i++){
-            fread(&data.values[i], sizeof(double), 1, dataIn);
-            data.values[i] *= 1000;
+            data.values[i] = inputArray[k*fileSize + i];
         }
         data.length = fileSize;
 
@@ -105,16 +109,14 @@ int main(void){//int argc, char **argv){
         //data = reorderData(raw_adc_data, WINDOW_SIZE);
         //data = decimateData(data);
         //data = windowData(data);
-        data = zeroPad(data);
+        //data = zeroPad(data);
         double *in;
         double *out;
         fftw_plan plan;
 
         in = (double*) fftw_malloc(sizeof(double) * data.length);
         out = (double*) fftw_malloc(sizeof(double) * data.length);
-        if(j == 0){
-            plan = fftw_plan_r2r_1d(data.length, in, out, FFTW_R2HC, FFTW_MEASURE);
-        }
+        plan = fftw_plan_r2r_1d(data.length, in, out, FFTW_R2HC, FFTW_MEASURE);
 
         for(uint32_t i=0; i<data.length; i++){
             in[i] = data.values[i];
@@ -139,22 +141,22 @@ int main(void){//int argc, char **argv){
         real_data.fs = imag_data.fs = 1000;//6173300; //~18 MHz is roughly our sampling frequency, this is divided by 3 becasue we have decimated by 3
 
         //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
-        //fftw_destroy_plan(plan);
+        fftw_destroy_plan(plan);
         fftw_free(in); fftw_free(out);
 
         psdx = calculateMagSquared(real_data, imag_data);
         psdx = filter(psdx);
         val = findPeak(psdx);
-        printf("The peak was found at a frequency of: %lf\r\n", val.actual_max_frequency);
-        interpolate(psdx, val, buf);
-        Power = calculatePower(buf, psdx.length);
+        //interpolate(psdx, val, buf);
+        Power = calculatePower(psdx.values, psdx.length);
         test_data.data = Power;
-        int intvar = 0;
-        if (sscanf (argv[1], "%i", &intvar) != 1) {
-            fprintf(stderr, "error - not an integer");
-        }
-        test_data.angle = intvar;
-        printf("Test Data Data is: %f, Test Data Angle is: %d\r\n", test_data.data, test_data.angle);
+        //int intvar = 0;
+        //if (sscanf (argv[1], "%i", &intvar) != 1) {
+        //    fprintf(stderr, "error - not an integer");
+        //}
+        double angle = (double)k*180/36;
+        test_data.angle = angle;//intvar;
+        printf("Test Data Data is: %f, Test Data Angle is: %f\r\n", test_data.data, angle);
         /* Send the data over the client socket to the server */
         printf("Sending data...\n");
         rc = send(client_sock, &test_data, BUFF_SIZE, 0);
@@ -165,9 +167,8 @@ int main(void){//int argc, char **argv){
         }
 
         printf("psdx fs: %d\n\r", psdx.fs);
-        printf("Power output: %lf\n\r", Power);
+        printf("Power output: %lf\n\r\n\r", Power);
     }
-    fftw_destroy_plan(plan);
 
     return 0;
 }
