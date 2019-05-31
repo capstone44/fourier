@@ -72,11 +72,11 @@ class ADF4158():
         self.write_value(frac_msb=frac_msb)
         self.write_value(frac_lsb=frac_lsb)
         self.write_value(cp_current=0)
-        self.write_value(pd_polarity=0)
-        self.write_value(csr_en=0)
+        self.write_value(pd_polarity=1)
+        self.write_value(csr_en=1)
         self.write_value(r_counter=1)
         self.write_value(prescaler=1)
-        self.write_value(ramp_on=0)
+        self.write_value(ramp_on=1)
         self.write_value(rdiv2=0)
         self.write_value(reference_doubler=0)
         self.write_value(clk1_divider=0)
@@ -157,13 +157,34 @@ class ADF4158():
         print 'deviation', dev
 
         self.write_value(step=steps)
-        self.write_value(dev_offset=dev_offset)
-        self.write_value(clk_div_mode=3)
-        self.write_value(ramp_on=0) # Turn the ramp on and off
+        self.write_value(cp_current=0)
         self.write_value(pd_polarity=1)
-        self.write_value(prescaler=1)
-        self.write_value(r_counter=1)
         self.write_value(csr_en=1)
+        self.write_value(r_counter=1)
+        self.write_value(prescaler=1)
+        self.write_value(rdiv2=0)
+        self.write_value(reference_doubler=0)
+        self.write_value(clk1_divider=0)
+        self.write_value(n_sel=0)
+        self.write_value(sd_reset=0)
+        self.write_value(psk_enable=0)
+        self.write_value(fsk_enable=0)
+        self.write_value(ldp=0)
+        self.write_value(power_down=0)
+        self.write_value(cp_threestate=0)
+        self.write_value(counter_reset=0)
+        self.write_value(le_sel=0)
+        self.write_value(sd_mod_mode=0)
+        self.write_value(clk_div_mode=3)
+        self.write_value(clk2_divider=0)
+        self.write_value(tx_ramp_clk=0)
+        self.write_value(par_ramp=0)
+        self.write_value(interrupt=0)
+        self.write_value(fsk_ramp_en=0)
+        self.write_value(ramp2_en=0)
+        self.write_value(deviation=dev)
+        self.write_value(ramp_del_fl=0)
+
 
         #Readback to muxout and negative bleed current
         #can't be activated simultaneously
@@ -195,6 +216,8 @@ class ADF4158():
             self.write_value(delay_start_divider=d)
         else:
             real_delay = 0
+
+        self.write_value(ramp_on=1)
 
         return real_delay
 

@@ -8,11 +8,14 @@ pll = ADF4158()
 
 f0 = 5.7998e9
 bw = 150e6
-tsweep = 15.0 #seconds for the whole sweep
+fstart = f0 - bw
+tsweep = 5.0 #seconds for the whole sweep
 fpd_freq = 10e6 #The PLL's reference is at 10 MHz
 step_size = int(10e6) # Step Size of 1 MHz
+delay = 0
 
-status = pll.freq_to_regs(f0, fpd_freq, bw, tsweep)
+#status = pll.freq_to_regs(f0, fpd_freq, bw, tsweep)
+status = pll.freq_ramp_to_regs(fstart, fpd_freq, bw, tsweep, delay)
 CLK = 11
 MOSI = 10
 CS = 5
