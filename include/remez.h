@@ -36,6 +36,21 @@
 /* Function prototype for remez() - the only function that should need be
  * called from external code
  */
+
+/********************
+ * INPUT:
+ * ------
+ * int     numtaps     - Number of filter coefficients
+ * int     numband     - Number of bands in filter specification
+ * double  bands[]     - User-specified band edges [2 * numband]
+ * double  des[]       - User-specified band responses [numband]
+ * double  weight[]    - User-specified error weights [numband]
+ * int     type        - Type of filter
+ *
+ * OUTPUT:
+ * -------
+ * double h[]      - Impulse response of final filter [numtaps]
+ ********************/
 void remez(double h[], int numtaps,
            int numband, double bands[], double des[], double weight[],
            int type);

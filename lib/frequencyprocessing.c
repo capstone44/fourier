@@ -62,9 +62,16 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
 /* stored in a variable initialized in               */
 /* frequencyprocessing.h.                            */
 /*****************************************************/
-struct signal filter(struct signal data){
+struct signal filter_default(struct signal data){
     for(uint32_t i=0; i<data.length; i++){
         data.values[i] *= filter_mag_squared[i];
+    }
+    return data;
+}
+
+struct signal filter(struct signal data, double LPF[]){
+    for(uint32_t i=0; i<data.length; i++){
+        data.values[i] *= LPF[i];
     }
     return data;
 }
