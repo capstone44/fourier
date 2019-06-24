@@ -15,6 +15,7 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
+static long device_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param);
 
 #define SUCCESS 0
 #define DEVICE_NAME "hsdk"// Dev name
@@ -82,10 +83,11 @@ static int major_num;
 static int open_flag = 0;
 
 static struct file_operations fops = {
-read : device_read,
+       read : device_read,
        write : device_write,
        open : device_open,
-       release : device_release
+       release : device_release,
+       unlocked_ioctl : device_ioctl
 };
 
 static struct bcm2835_peripheral myclock = {CLOCK_BASE};
@@ -260,6 +262,9 @@ device_write(struct file *filp, const char *buff, size_t len, loff_t * off)
     return -EINVAL;
 }
 
+static long device_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param){
+    return sampled_output.time;
+}
 
 MODULE_AUTHOR("jholtom");
 MODULE_LICENSE("GPL");
