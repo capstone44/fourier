@@ -145,15 +145,15 @@ void interpolate(struct signal psdx, struct max_values val, double *buf){
     double left_value = val.left_value;
     double right_value = val.right_value;
 
-    uint16_t startAvg = 200;
-    uint16_t endAvg = 2000;
+    uint16_t startAvg = 2000;
+    uint16_t endAvg = 4000;
     uint16_t avgLength = endAvg - startAvg;
     double noiseAvg = 0;
     double threshold = 0;
     for(int32_t i=startAvg; i<endAvg; i++){
         noiseAvg += psdx.frequencies[i];
     }
-    noiseAvg = 0.01; ///= avgLength;
+    noiseAvg /= avgLength;
     threshold = 20*noiseAvg;
 
     for(uint32_t i=0; i<psdx.length-1; i++){

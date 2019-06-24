@@ -43,7 +43,7 @@ LIBS = -lfftw3 -lm -lrt -ldl
 # define the C source files
 FFTLIBS = lib/fftfiles
 S = $(FFTLIBS)/($SS)
-SRCS = main.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c
+SRCS = main.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c lib/remez.c
 
 # define the C object files
 #

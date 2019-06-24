@@ -27,12 +27,14 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <math.h>
-#include "globals.h"
-#include "timeprocessing.h"
-#include "frequencyprocessing.h"
 #include </usr/local/include/fftw3.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
+#include "globals.h"
+#include "timeprocessing.h"
+#include "frequencyprocessing.h"
+#include "remez.h"
 
 #define CLIENT_SOCK_PATH "/tmp/power_data.sock"  //This is where you send data, you are the client to the python server.
 #define SERVER_SOCK_PATH "/tmp/gui_control.sock" //This is where you receive data, you are the server to the python client.
@@ -40,6 +42,9 @@
 #define TEST_RUN_LENGTH 60                       //Arbitrary test run length
 
 #define PI 3.14159265 //For quick demos sake
+#define NUMTAPS 121
+#define NUMBANDS 2
+#define BANDS 4
 
 struct rf_data
 {
@@ -95,8 +100,9 @@ int main(void)
     system("/bin/cat /dev/hsdk > /tmp/sample.bin");
     sleep(1);
     printf("Successfully sampled ADC\r\n");
-    file_desc = open("/dev/hsdk",0);
-    long sample_time = ioctl(file_desc,0,0);
+    int file_desc = open("/dev/hsdk",0);
+    double fs = ioctl(file_desc,0,0);
+    printf("fs: %g\n\r", fs);
 
     dataIn = fopen("/tmp/sample.bin", "rb");
     if (!dataIn)
@@ -121,24 +127,22 @@ int main(void)
     //Use the Parks-McClellan Algorithm to create a lowpass filter
     double fc1 = 60;
     double fc2 = 1000;
-    double fc1_norm = 60/fs;
+    double fc1_norm = fc1/fs;
     double fc2_norm = fc2/fs;
-    int numtaps = 121;
-    int numbands = 2;
-    double lpf[numtaps];
-    double bands[2*numbands] = {0, fc1_norm, fc2_norm, 1};
-    double des[numbands] = {1, 1, 0, 0};
-    double weight[numbands] = {1, 1, 1, 1}; //TODO might need to change this
+    double lpf[NUMTAPS];
+    double bands[BANDS] = {0, fc1_norm, fc2_norm, 1};
+    double des[NUMBANDS] = {1, 0};
+    double weight[NUMBANDS] = {1, 1}; //TODO might need to change this
     int type = 0;
     int is_good;
 
     //If Parks-McClellan converged
-    is_good = remez(lpf[], numtaps, numbands, bands[], des[], weight[], type);
+    is_good = remez(lpf, NUMTAPS, NUMBANDS, bands, des, weight, type);
 
     if (is_good)
     {
         //Send signal and filter through FFTW
-        double LPF_image[data.length];
+        double LPF_imag[data.length];
         double LPF_real[data.length];
 
         double *in_data;
@@ -160,7 +164,7 @@ int main(void)
         for (uint32_t i = 0; i < data.length; i++)
         {
             in_data[i] = data.values[i];
-            if (i < numtaps)
+            if (i < NUMTAPS)
             {
                 in_lpf[i] = lpf[i];
             }
@@ -246,12 +250,12 @@ int main(void)
         imag_data.values[0] = 0;
         for (uint32_t i = 0; i < data.length / 2 + 1; i++)
         {
-            real_data.values[i] = out_data[i];
+            real_data.values[i] = out[i];
         }
         uint32_t j = data.length - 1;
         for (uint32_t i = 1; i < data.length / 2; i++)
         {
-            imag_data.values[i] = out_data[j];
+            imag_data.values[i] = out[j];
             j--;
         }
         imag_data.values[0] = 0;
@@ -272,14 +276,14 @@ int main(void)
     }
 
     val = findPeak(psdx);
-    //interpolate(psdx, val, buf);
+    interpolate(psdx, val, buf);
     Power = calculatePower(psdx.values, psdx.length);
     test_data.data = Power;
     //int intvar = 0;
     //if (sscanf (argv[1], "%i", &intvar) != 1) {
     //    fprintf(stderr, "error - not an integer");
     //}
-    double angle = (double)k * 180 / 36;
+    double angle = 0;//(double)k * 180 / 36;
     test_data.angle = angle; //intvar;
     printf("Test Data Data is: %f, Test Data Angle is: %f\r\n", test_data.data, angle);
     /* Send the data over the client socket to the server */
@@ -294,7 +298,6 @@ int main(void)
 
     //printf("psdx fs: %d\n\r", psdx.fs);
     //printf("Power output: %lf\n\r\n\r", Power);
-}
 
 return 0;
 }

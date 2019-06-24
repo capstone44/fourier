@@ -51,7 +51,7 @@
  * -------
  * double h[]      - Impulse response of final filter [numtaps]
  ********************/
-void remez(double h[], int numtaps,
+int remez(double h[], int numtaps,
            int numband, double bands[], double des[], double weight[],
            int type);
 
