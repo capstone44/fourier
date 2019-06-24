@@ -95,6 +95,8 @@ int main(void)
     system("/bin/cat /dev/hsdk > /tmp/sample.bin");
     sleep(1);
     printf("Successfully sampled ADC\r\n");
+    file_desc = open("/dev/hsdk",0);
+    long sample_time = ioctl(file_desc,0,0);
 
     dataIn = fopen("/tmp/sample.bin", "rb");
     if (!dataIn)
