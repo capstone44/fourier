@@ -15,7 +15,7 @@ static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *, struct file *);
 static ssize_t device_read(struct file *, char *, size_t, loff_t *);
 static ssize_t device_write(struct file *, const char *, size_t, loff_t *);
-static long device_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param);
+static long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param);
 
 #define SUCCESS 0
 #define DEVICE_NAME "hsdk"// Dev name
@@ -262,7 +262,7 @@ device_write(struct file *filp, const char *buff, size_t len, loff_t * off)
     return -EINVAL;
 }
 
-static long device_ioctl(struct inode *inode, struct file *file, unsigned int ioctl_num, unsigned long ioctl_param){
+static long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param){
     return sampled_output.time;
 }
 
