@@ -42,6 +42,7 @@
 #define TEST_RUN_LENGTH 60                       //Arbitrary test run length
 
 #define PI 3.14159265 //For quick demos sake
+#define NANO_SECOND 1e-9
 #define NUMTAPS 121
 #define NUMBANDS 2
 #define BANDS 4
@@ -101,7 +102,8 @@ int main(void)
     sleep(1);
     printf("Successfully sampled ADC\r\n");
     int file_desc = open("/dev/hsdk",0);
-    double fs = ioctl(file_desc,0,0);
+    double sample_time = ioctl(file_desc,0,0);
+    double fs = 1/(sample_time*NANO_SECOND)*WINDOW_SIZE;
     printf("fs: %g\n\r", fs);
 
     dataIn = fopen("/tmp/sample.bin", "rb");
@@ -197,7 +199,7 @@ int main(void)
         real_data.length = data.length / 2;
         imag_data.length = data.length / 2;
 
-        //real_data.fs = imag_data.fs = 1000; //6173300; //~18 MHz is roughly our sampling frequency, this is divided by 3 becasue we have decimated by 3
+        real_data.fs = imag_data.fs = fs; //6173300; //~18 MHz is roughly our sampling frequency, this is divided by 3 becasue we have decimated by 3
         // TODO real_data.fs = imag_data.fs =
 
         //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
