@@ -21,8 +21,8 @@
 /* which will be used to extract the 10 bit number that        */
 /* is the actual value.                                        */
 /***************************************************************/
-const char ADC1_GPIO[] = {9,25,10,22,27,17,18,15,14,24};
-const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,11,21};
+const char ADC1_GPIO[] = {9,25,23,22,27,17,18,15,14,24}; //This is the pin numbering on the current revision of the board - JBH 06/25/19
+const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,6,21}; //Again, current revision numbering - JBH 06/25/19
 
 /**********************************************/
 /* The output of the ADC does not have the    */
