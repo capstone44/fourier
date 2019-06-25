@@ -43,7 +43,7 @@ static long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned lon
 //ADC 1
 #define BIT0_ADC1 9
 #define BIT1_ADC1 25
-#define BIT2_ADC1 10
+#define BIT2_ADC1 23
 #define BIT3_ADC1 22
 #define BIT4_ADC1 27
 #define BIT5_ADC1 17
@@ -61,7 +61,7 @@ static long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned lon
 #define BIT5_ADC2 12
 #define BIT6_ADC2 7
 #define BIT7_ADC2 8
-#define BIT8_ADC2 11
+#define BIT8_ADC2 6
 #define BIT9_ADC2 21
 
 //CLOCK
