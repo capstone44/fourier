@@ -40,10 +40,15 @@ static long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned lon
 
 #define SAMPLE_SIZE 25000 //50000 pts
 
+/*
+const char ADC1_GPIO[] = {9,25,23,22,27,17,18,15,14,24}; //This is the pin numbering on the current revision of the board - JBH 06/25/19
+const char ADC2_GPIO[] = {20,26,16,19,13,12,7,8,6,21}; //Again, current revision numbering - JBH 06/25/19
+*/
+
 //ADC 1
 #define BIT0_ADC1 9
 #define BIT1_ADC1 25
-#define BIT2_ADC1 10
+#define BIT2_ADC1 23
 #define BIT3_ADC1 22
 #define BIT4_ADC1 27
 #define BIT5_ADC1 17
@@ -61,7 +66,7 @@ static long device_ioctl(struct file *file, unsigned int ioctl_num, unsigned lon
 #define BIT5_ADC2 12
 #define BIT6_ADC2 7
 #define BIT7_ADC2 8
-#define BIT8_ADC2 11
+#define BIT8_ADC2 6
 #define BIT9_ADC2 21
 
 //CLOCK
