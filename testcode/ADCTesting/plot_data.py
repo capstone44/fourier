@@ -3,16 +3,16 @@ import matplotlib.pyplot as plt
 from array import array
 import scipy.io
 import math
-RawData ="beat_test.bin"
+RawData ="real_data_tm.bin"
 f = open(RawData, "r")
 a = np.fromfile(f, dtype=np.uint32)
 #t = 2668891
 V = a[:-1].copy()
 #T = [ (( x * t ) / ( 1000.0*len(V) )) for x in 2*range(len(V))]
 
-ADC1_GPIO = [9,25,10,22,27,17,18,15,14,24]
+ADC1_GPIO = [9,25,23,22,27,17,18,15,14,24]
 
-ADC2_GPIO = [20,26,16,19,13,12,7,8,11,21]
+ADC2_GPIO = [20,26,16,19,13,12,7,8,6,21]
 
 print(type(20))
 
