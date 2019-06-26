@@ -1,7 +1,7 @@
 /**************************************************************************
  * Parks-McClellan algorithm for FIR filter design (C version)
  *-------------------------------------------------
- *  Copyright (c) 1995,1998  Jake Janovetz <janovetz@uiuc.edu>
+ *  Copyright (c) 1995,1998  Jake Janovetz (janovetz@uiuc.edu)
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Library General Public
@@ -17,38 +17,13 @@
  *  License along with this library; if not, write to the Free
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *
- *  Sep 1999 - Paul Kienzle (pkienzle@cs.indiana.edu)
- *      Modified for use in octave as a replacement for the matlab function
- *      remez.mex.  In particular, magnitude responses are required for all
- *      band edges rather than one per band, griddensity is a parameter,
- *      and errors are returned rather than printed directly.
- *  Mar 2000 - Kai Habel (kahacjde@linux.zrz.tu-berlin.de)
- *      Change: ColumnVector x=arg(i).vector_value();
- *      to: ColumnVector x(arg(i).vector_value());
- *  There appear to be some problems with the routine Search. See comments
- *  therein [search for PAK:].  I haven't looked closely at the rest
- *  of the code---it may also have some problems.
  *************************************************************************/
 
+
+#include "remez.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <R.h>
-
-#define CONST const
-#define BANDPASS       1
-#define DIFFERENTIATOR 2
-#define HILBERT        3
-
-#define NEGATIVE       0
-#define POSITIVE       1
-
-#define Pi             3.1415926535897932
-#define Pi2            6.2831853071795865
-
-#define GRIDDENSITY    16
-#define MAXITERATIONS  40
 
 /*******************
  * CreateDenseGrid
@@ -64,10 +39,9 @@
  * int      numtaps  - Number of taps in the resulting filter
  * int      numband  - Number of bands in user specification
  * double   bands[]  - User-specified band edges [2*numband]
- * double   des[]    - Desired response per band [2*numband]
+ * double   des[]    - Desired response per band [numband]
  * double   weight[] - Weight per band [numband]
  * int      symmetry - Symmetry of filter - used for grid check
- * int      griddensity
  *
  * OUTPUT:
  * -------
@@ -77,31 +51,34 @@
  * double W[]        - Weight function on the dense grid [gridsize]
  *******************/
 
-void CreateDenseGrid(int r, int numtaps, int numband, const double bands[],
-                     const double des[], const double weight[], int gridsize,
+void CreateDenseGrid(int r, int numtaps, int numband, double bands[],
+                     double des[], double weight[], int *gridsize,
                      double Grid[], double D[], double W[],
-                     int symmetry, int griddensity)
+                     int symmetry)
 {
    int i, j, k, band;
-   double delf, lowf, highf, grid0;
+   double delf, lowf, highf;
 
-   delf = 0.5/(griddensity*r);
+   delf = 0.5/(GRIDDENSITY*r);
 
 /*
  * For differentiator, hilbert,
- *   symmetry is odd and Grid[0] = max(delf, bands[0])
+ *   symmetry is odd and Grid[0] = max(delf, band[0])
  */
-   grid0 = (symmetry == NEGATIVE) && (delf > bands[0]) ? delf : bands[0];
+
+   if ((symmetry == NEGATIVE) && (delf > bands[0]))
+      bands[0] = delf;
 
    j=0;
    for (band=0; band < numband; band++)
    {
-      lowf = (band==0 ? grid0 : bands[2*band]);
+      Grid[j] = bands[2*band];
+      lowf = bands[2*band];
       highf = bands[2*band + 1];
       k = (int)((highf - lowf)/delf + 0.5);   /* .5 for rounding */
       for (i=0; i<k; i++)
       {
-         D[j] = des[2*band] + i*(des[2*band+1]-des[2*band])/(k-1);
+         D[j] = des[band];
          W[j] = weight[band];
          Grid[j] = lowf;
          lowf += delf;
@@ -115,10 +92,10 @@ void CreateDenseGrid(int r, int numtaps, int numband, const double bands[],
  *  - but, if there are even taps, leave the last grid point at .5
  */
    if ((symmetry == NEGATIVE) &&
-       (Grid[gridsize-1] > (0.5 - delf)) &&
+       (Grid[*gridsize-1] > (0.5 - delf)) &&
        (numtaps % 2))
    {
-      Grid[gridsize-1] = 0.5-delf;
+      Grid[*gridsize-1] = 0.5-delf;
    }
 }
 
@@ -331,7 +308,8 @@ void CalcError(int r, double ad[], double x[], double y[],
  * -------
  * int    Ext[]    - New indexes to extremal frequencies [r+1]
  ************************/
-int Search(int r, int Ext[],
+
+void Search(int r, int Ext[],
             int gridsize, double E[])
 {
     printf("Entered Search\n\r");
@@ -358,11 +336,8 @@ int Search(int r, int Ext[],
    for (i=1; i<gridsize-1; i++)
    {
       if (((E[i]>=E[i-1]) && (E[i]>E[i+1]) && (E[i]>0.0)) ||
-          ((E[i]<=E[i-1]) && (E[i]<E[i+1]) && (E[i]<0.0))) {
-    // PAK: we sometimes get too many extremal frequencies
-    if (k >= 2*r) return -3;
-    foundExt[k++] = i;
-      }
+          ((E[i]<=E[i-1]) && (E[i]<E[i+1]) && (E[i]<0.0)))
+         foundExt[k++] = i;
    }
 
 /*
@@ -370,19 +345,13 @@ int Search(int r, int Ext[],
  */
    j = gridsize-1;
    if (((E[j]>0.0) && (E[j]>E[j-1])) ||
-       ((E[j]<0.0) && (E[j]<E[j-1]))) {
-     if (k >= 2*r) return -3;
-     foundExt[k++] = j;
-   }
-
-   // PAK: we sometimes get not enough extremal frequencies
-   if (k < r+1) return -2;
+       ((E[j]<0.0) && (E[j]<E[j-1])))
+      foundExt[k++] = j;
 
 /*
  * Remove extra extremals
  */
    extra = k - (r+1);
-   //   assert(extra >= 0);
 
    while (extra > 0)
    {
@@ -404,14 +373,8 @@ int Search(int r, int Ext[],
          else if ((!up) && (E[foundExt[j]] > 0.0))
             up = 1;             /* switch to a maxima */
          else
-     { 
+	 { 
             alt = 0;
-        // PAK: break now and you will delete the smallest overall
-        // extremal.  If you want to delete the smallest of the
-        // pair of non-alternating extremals, then you must do:
-            //
-        // if (fabs(E[foundExt[j]]) < fabs(E[foundExt[j-1]])) l=j;
-        // else l=j-1;
             break;              /* Ooops, found two non-alternating */
          }                      /* extrema.  Delete smallest of them */
       }  /* if the loop finishes, all extrema are alternating */
@@ -423,10 +386,9 @@ int Search(int r, int Ext[],
       if ((alt) && (extra == 1))
       {
          if (fabs(E[foundExt[k-1]]) < fabs(E[foundExt[0]]))
-       /* Delete last extremal */
-       l = k-1;
-       // PAK: changed from l = foundExt[k-1]; 
+            l = foundExt[k-1];   /* Delete last extremal */
          else
+<<<<<<< HEAD
 <<<<<<< HEAD
             l = foundExt[0];     /* Delete first extremal */
          printf("k in last extremal: %d\n\r", k-1);
@@ -435,16 +397,22 @@ int Search(int r, int Ext[],
        l = 0;
        // PAK: changed from l = foundExt[0];     
 >>>>>>> parent of 7e8e7db... Went back to original version
+=======
+            l = foundExt[0];     /* Delete first extremal */
+>>>>>>> parent of 38b2312... Update remez.c
       }
 
-      for (j=l; j<k-1; j++)        /* Loop that does the deletion */
+      for (j=l; j<k; j++)        /* Loop that does the deletion */
       {
          foundExt[j] = foundExt[j+1];
+<<<<<<< HEAD
 <<<<<<< HEAD
          //printf("j+1 at end: %d\n\r", j+1);
 =======
          //  assert(foundExt[j]<gridsize);
 >>>>>>> parent of 7e8e7db... Went back to original version
+=======
+>>>>>>> parent of 38b2312... Update remez.c
       }
       k--;
       extra--;
@@ -452,13 +420,11 @@ int Search(int r, int Ext[],
 
    for (i=0; i<=r; i++)
    {
-     //      assert(foundExt[i]<gridsize);
       Ext[i] = foundExt[i];       /* Copy found extremals to Ext[] */
       //printf("i in last loop: %d\n\r", i);
    }
 
    free(foundExt);
-   return 0;
 }
 
 
@@ -555,7 +521,7 @@ void FreqSample(int N, double A[], double h[], int symm)
  * Returns 0 if the result has not converged
  ********************/
 
-int isDone(int r, int Ext[], double E[])
+short isDone(int r, int Ext[], double E[])
 {
    int i;
    double min, max, current;
@@ -569,7 +535,9 @@ int isDone(int r, int Ext[], double E[])
       if (current > max)
          max = current;
    }
-   return (((max-min)/max) < 0.0001);
+   if (((max-min)/max) < 0.0001)
+      return 1;
+   return 0;
 }
 
 /********************
@@ -582,19 +550,19 @@ int isDone(int r, int Ext[], double E[])
  *
  * INPUT:
  * ------
- * int     *numtaps     - Number of filter coefficients
- * int     *numband     - Number of bands in filter specification
- * double  bands[]      - User-specified band edges [2 * numband]
- * double  des[]        - User-specified band responses [2 * numband]
- * double  weight[]     - User-specified error weights [numband]
- * int     *type        - Type of filter
- * int     *griddensity - ??
+ * int     numtaps     - Number of filter coefficients
+ * int     numband     - Number of bands in filter specification
+ * double  bands[]     - User-specified band edges [2 * numband]
+ * double  des[]       - User-specified band responses [numband]
+ * double  weight[]    - User-specified error weights [numband]
+ * int     type        - Type of filter
  *
  * OUTPUT:
  * -------
  * double h[]      - Impulse response of final filter [numtaps]
  ********************/
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 int remez(double h[], int numtaps,
            int numband, double bands[], double des[], double weight[],
@@ -605,6 +573,11 @@ void remez(double h[], int *numtaps,
       const double des[], const double weight[],
       int *type, int *griddensity)
 >>>>>>> parent of 7e8e7db... Went back to original version
+=======
+int remez(double h[], int numtaps,
+           int numband, double bands[], double des[], double weight[],
+           int type)
+>>>>>>> parent of 38b2312... Update remez.c
 {
     printf("Entered remez\n\r");
    double *Grid, *W, *D, *E;
@@ -613,23 +586,23 @@ void remez(double h[], int *numtaps,
    double *x, *y, *ad;
    int    symmetry;
 
-   if (*type == BANDPASS)
+   if (type == BANDPASS)
       symmetry = POSITIVE;
    else
       symmetry = NEGATIVE;
 
-   r = *numtaps / 2;                  /* number of extrema */
-   if ((*numtaps % 2) && (symmetry == POSITIVE))
+   r = numtaps/2;                  /* number of extrema */
+   if ((numtaps%2) && (symmetry == POSITIVE))
       r++;
-   h[0] = 32;
+
 /*
  * Predict dense grid size in advance for memory allocation
  *   .5 is so we round up, not truncate
  */
    gridsize = 0;
-   for (i=0; i < *numband; i++)
+   for (i=0; i<numband; i++)
    {
-      gridsize += (int)(2 * r * (*griddensity) * (bands[2*i+1] - bands[2*i]) + .5);
+      gridsize += (int)(2*r*GRIDDENSITY*(bands[2*i+1] - bands[2*i]) + .5);
    }
    if (symmetry == NEGATIVE)
    {
@@ -653,6 +626,7 @@ void remez(double h[], int *numtaps,
  * Create dense frequency grid
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
    CreateDenseGrid(r, numtaps, numband, bands, des, weight,
                    &gridsize, Grid, D, W, symmetry);
    printf("Created Grid\n\r");
@@ -660,13 +634,17 @@ void remez(double h[], int *numtaps,
    CreateDenseGrid(r, *numtaps, *numband, bands, des, weight,
                    gridsize, Grid, D, W, symmetry, *griddensity);
 >>>>>>> parent of 7e8e7db... Went back to original version
+=======
+   CreateDenseGrid(r, numtaps, numband, bands, des, weight,
+                   &gridsize, Grid, D, W, symmetry);
+>>>>>>> parent of 38b2312... Update remez.c
    InitialGuess(r, Ext, gridsize);
    printf("Made guess\n\r");
 
 /*
  * For Differentiator: (fix grid)
  */
-   if (*type == DIFFERENTIATOR)
+   if (type == DIFFERENTIATOR)
    {
       for (i=0; i<gridsize; i++)
       {
@@ -682,7 +660,7 @@ void remez(double h[], int *numtaps,
  */
    if (symmetry == POSITIVE)
    {
-      if (*numtaps % 2 == 0)
+      if (numtaps % 2 == 0)
       {
          for (i=0; i<gridsize; i++)
          {
@@ -694,7 +672,7 @@ void remez(double h[], int *numtaps,
    }
    else
    {
-      if (*numtaps % 2)
+      if (numtaps % 2)
       {
          for (i=0; i<gridsize; i++)
          {
@@ -725,6 +703,7 @@ void remez(double h[], int *numtaps,
       printf("CalcParms iter: %d\n\r", iter);
       CalcError(r, ad, x, y, gridsize, Grid, D, W, E);
 <<<<<<< HEAD
+<<<<<<< HEAD
       printf("CalcError iter: %d\n\r", iter);
       Search(r, Ext, gridsize, E);
       printf("Search iter: %d\n\r", iter);
@@ -754,6 +733,16 @@ void remez(double h[], int *numtaps,
 >>>>>>> parent of 7e8e7db... Went back to original version
 
    printf("Performed Remez\n\r");
+=======
+      Search(r, Ext, gridsize, E);
+      if (isDone(r, Ext, E))
+         break;
+   }
+   if (iter == MAXITERATIONS)
+   {
+      return -1;
+   }
+>>>>>>> parent of 38b2312... Update remez.c
 
    CalcParms(r, Ext, Grid, D, W, ad, x, y);
 
@@ -762,38 +751,46 @@ void remez(double h[], int *numtaps,
  * Sampling.  If odd or Negative symmetry, fix the taps
  * according to Parks McClellan
  */
-   for (i=0; i <= *numtaps / 2; i++)
+   for (i=0; i<=numtaps/2; i++)
    {
       if (symmetry == POSITIVE)
       {
-         if (*numtaps % 2)
+         if (numtaps%2)
             c = 1;
          else
-            c = cos(Pi * (double)i / *numtaps);
+            c = cos(Pi * (double)i/numtaps);
       }
       else
       {
-         if (*numtaps % 2)
-            c = sin(Pi2 * (double)i / *numtaps);
+         if (numtaps%2)
+            c = sin(Pi2 * (double)i/numtaps);
          else
-            c = sin(Pi * (double)i / *numtaps);
+            c = sin(Pi * (double)i/numtaps);
       }
+<<<<<<< HEAD
 <<<<<<< HEAD
       taps[i] = ComputeA((double)i/numtaps, r, ad, x, y)*c;
       printf("Tap[%d]: %g\n\r", i, taps[i]);
 =======
       taps[i] = ComputeA((double)i / *numtaps, r, ad, x, y) * c;
 >>>>>>> parent of 7e8e7db... Went back to original version
+=======
+      taps[i] = ComputeA((double)i/numtaps, r, ad, x, y)*c;
+>>>>>>> parent of 38b2312... Update remez.c
    }
 
 /*
  * Frequency sampling design with calculated taps
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
    FreqSample(numtaps, taps, h, symmetry);
    printf("Freq Sampled\n\r");
 =======
    FreqSample(*numtaps, taps, h, symmetry);
+=======
+   FreqSample(numtaps, taps, h, symmetry);
+>>>>>>> parent of 38b2312... Update remez.c
 
 >>>>>>> parent of 7e8e7db... Went back to original version
 /*
