@@ -121,21 +121,22 @@ int main(void)
     fclose(dataIn);
 
     //Perform time processing
+    testCodeTime(raw_adc_data, WINDOW_SIZE);
     data = reorderData(raw_adc_data, WINDOW_SIZE);
     data = decimateData(data);
     data = windowData(data);
     //data = zeroPad(data);
 
     //Use the Parks-McClellan Algorithm to create a lowpass filter
-    double fc1 = 200;
-    double fc2 = 1000000;
-    double fc1_norm = fc1/fs/2;
-    double fc2_norm = fc2/fs/2;
+    double fc1 = 1000;
+    double fc2 = 10000;
+    double fc1_norm = 0.1;//fc1/fs/2;
+    double fc2_norm = 0.2;//fc2/fs/2;
     double lpf[NUMTAPS];
     double bands[BANDS] = {0, fc1_norm, fc2_norm, 1};
     double des[NUMBANDS] = {1, 0};
     double weight[NUMBANDS] = {1, 0.1};
-    int type = 1;
+    int type = 0;
     int is_good = false;
 
     printf("fs: %g\n\r fc1_norm: %g\n\r fc2_norm: %g\n\r", fs, fc1_norm, fc2_norm);
@@ -233,6 +234,7 @@ int main(void)
             }
         }
 
+        printf("Writing output file\n\r");
         FILE *dataOut;
         dataOut = fopen("LPF.txt","wb");
         if(dataOut == NULL)

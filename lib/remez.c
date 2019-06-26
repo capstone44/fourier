@@ -312,6 +312,7 @@ void CalcError(int r, double ad[], double x[], double y[],
 void Search(int r, int Ext[],
             int gridsize, double E[])
 {
+    printf("Entered Search\n\r");
    int i, j, k, l, extra;     /* Counters */
    int up, alt;
    int *foundExt;             /* Array of found extremals */
@@ -347,7 +348,6 @@ void Search(int r, int Ext[],
        ((E[j]<0.0) && (E[j]<E[j-1])))
       foundExt[k++] = j;
 
-
 /*
  * Remove extra extremals
  */
@@ -355,6 +355,8 @@ void Search(int r, int Ext[],
 
    while (extra > 0)
    {
+       printf("extra: %d\n\r", extra);
+       printf("k: %d\n\r", k);
       if (E[foundExt[0]] > 0.0)
          up = 1;                /* first one is a maxima */
       else
@@ -387,11 +389,13 @@ void Search(int r, int Ext[],
             l = foundExt[k-1];   /* Delete last extremal */
          else
             l = foundExt[0];     /* Delete first extremal */
+         printf("k in last extremal: %d\n\r", k-1);
       }
 
       for (j=l; j<k; j++)        /* Loop that does the deletion */
       {
          foundExt[j] = foundExt[j+1];
+         //printf("j+1 at end: %d\n\r", j+1);
       }
       k--;
       extra--;
@@ -400,6 +404,7 @@ void Search(int r, int Ext[],
    for (i=0; i<=r; i++)
    {
       Ext[i] = foundExt[i];       /* Copy found extremals to Ext[] */
+      //printf("i in last loop: %d\n\r", i);
    }
 
    free(foundExt);
@@ -540,10 +545,11 @@ short isDone(int r, int Ext[], double E[])
  * double h[]      - Impulse response of final filter [numtaps]
  ********************/
 
-void remez(double h[], int numtaps,
+int remez(double h[], int numtaps,
            int numband, double bands[], double des[], double weight[],
            int type)
 {
+    printf("Entered remez\n\r");
    double *Grid, *W, *D, *E;
    int    i, iter, gridsize, r, *Ext;
    double *taps, c;
@@ -591,7 +597,9 @@ void remez(double h[], int numtaps,
  */
    CreateDenseGrid(r, numtaps, numband, bands, des, weight,
                    &gridsize, Grid, D, W, symmetry);
+   printf("Created Grid\n\r");
    InitialGuess(r, Ext, gridsize);
+   printf("Made guess\n\r");
 
 /*
  * For Differentiator: (fix grid)
@@ -644,21 +652,37 @@ void remez(double h[], int numtaps,
       }
    }
 
+    printf("Performing Remez\n\r");
+
 /*
  * Perform the Remez Exchange algorithm
  */
    for (iter=0; iter<MAXITERATIONS; iter++)
    {
       CalcParms(r, Ext, Grid, D, W, ad, x, y);
+      printf("CalcParms iter: %d\n\r", iter);
       CalcError(r, ad, x, y, gridsize, Grid, D, W, E);
+      printf("CalcError iter: %d\n\r", iter);
       Search(r, Ext, gridsize, E);
+      printf("Search iter: %d\n\r", iter);
       if (isDone(r, Ext, E))
          break;
    }
    if (iter == MAXITERATIONS)
    {
       printf("Reached maximum iteration count.\nResults may be bad.\n");
+      free(Grid);
+      free(W);
+      free(D);
+      free(E);
+      free(Ext);
+      free(x);
+      free(y);
+      free(ad);
+      return -1;
    }
+
+   printf("Performed Remez\n\r");
 
    CalcParms(r, Ext, Grid, D, W, ad, x, y);
 
@@ -684,13 +708,14 @@ void remez(double h[], int numtaps,
             c = sin(Pi * (double)i/numtaps);
       }
       taps[i] = ComputeA((double)i/numtaps, r, ad, x, y)*c;
+      printf("Tap[%d]: %g\n\r", i, taps[i]);
    }
 
 /*
  * Frequency sampling design with calculated taps
  */
    FreqSample(numtaps, taps, h, symmetry);
-
+   printf("Freq Sampled\n\r");
 /*
  * Delete allocated memory
  */
@@ -702,4 +727,6 @@ void remez(double h[], int numtaps,
    free(x);
    free(y);
    free(ad);
+
+   return 1;
 }

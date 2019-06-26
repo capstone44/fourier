@@ -31,7 +31,7 @@
 #define Pi2            6.2831853071795865
 
 #define GRIDDENSITY    16
-#define MAXITERATIONS  400
+#define MAXITERATIONS  40
 
 /* Function prototype for remez() - the only function that should need be
  * called from external code

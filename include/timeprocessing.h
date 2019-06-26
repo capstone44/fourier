@@ -67,7 +67,7 @@ struct signal zeroPad(struct signal data);
 /* decimateData()    : 2                                     */
 /* windowData()      : 3                                     */
 /*************************************************************/
-#define TEST_FUNCTION_TIME 3
+#define TEST_FUNCTION_TIME 1
 
 #if TEST_FUNCTION_TIME == 1
 void testCodeTime(uint32_t raw_adc_data[], uint32_t N);
