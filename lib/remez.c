@@ -312,7 +312,6 @@ void CalcError(int r, double ad[], double x[], double y[],
 void Search(int r, int Ext[],
             int gridsize, double E[])
 {
-    printf("Entered Search\n\r");
    int i, j, k, l, extra;     /* Counters */
    int up, alt;
    int *foundExt;             /* Array of found extremals */
@@ -355,8 +354,6 @@ void Search(int r, int Ext[],
 
    while (extra > 0)
    {
-       printf("extra: %d\n\r", extra);
-       printf("k: %d\n\r", k);
       if (E[foundExt[0]] > 0.0)
          up = 1;                /* first one is a maxima */
       else
@@ -388,31 +385,15 @@ void Search(int r, int Ext[],
          if (fabs(E[foundExt[k-1]]) < fabs(E[foundExt[0]]))
             l = foundExt[k-1];   /* Delete last extremal */
          else
-<<<<<<< HEAD
-<<<<<<< HEAD
             l = foundExt[0];     /* Delete first extremal */
-         printf("k in last extremal: %d\n\r", k-1);
-=======
        /* Delete first extremal */
        l = 0;
        // PAK: changed from l = foundExt[0];     
->>>>>>> parent of 7e8e7db... Went back to original version
-=======
-            l = foundExt[0];     /* Delete first extremal */
->>>>>>> parent of 38b2312... Update remez.c
       }
 
       for (j=l; j<k; j++)        /* Loop that does the deletion */
       {
          foundExt[j] = foundExt[j+1];
-<<<<<<< HEAD
-<<<<<<< HEAD
-         //printf("j+1 at end: %d\n\r", j+1);
-=======
-         //  assert(foundExt[j]<gridsize);
->>>>>>> parent of 7e8e7db... Went back to original version
-=======
->>>>>>> parent of 38b2312... Update remez.c
       }
       k--;
       extra--;
@@ -421,7 +402,6 @@ void Search(int r, int Ext[],
    for (i=0; i<=r; i++)
    {
       Ext[i] = foundExt[i];       /* Copy found extremals to Ext[] */
-      //printf("i in last loop: %d\n\r", i);
    }
 
    free(foundExt);
@@ -562,24 +542,10 @@ short isDone(int r, int Ext[], double E[])
  * double h[]      - Impulse response of final filter [numtaps]
  ********************/
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 int remez(double h[], int numtaps,
            int numband, double bands[], double des[], double weight[],
            int type)
-=======
-void remez(double h[], int *numtaps,
-      int *numband, const double bands[], 
-      const double des[], const double weight[],
-      int *type, int *griddensity)
->>>>>>> parent of 7e8e7db... Went back to original version
-=======
-int remez(double h[], int numtaps,
-           int numband, double bands[], double des[], double weight[],
-           int type)
->>>>>>> parent of 38b2312... Update remez.c
 {
-    printf("Entered remez\n\r");
    double *Grid, *W, *D, *E;
    int    i, iter, gridsize, r, *Ext;
    double *taps, c;
@@ -625,21 +591,9 @@ int remez(double h[], int numtaps,
 /*
  * Create dense frequency grid
  */
-<<<<<<< HEAD
-<<<<<<< HEAD
    CreateDenseGrid(r, numtaps, numband, bands, des, weight,
                    &gridsize, Grid, D, W, symmetry);
-   printf("Created Grid\n\r");
-=======
-   CreateDenseGrid(r, *numtaps, *numband, bands, des, weight,
-                   gridsize, Grid, D, W, symmetry, *griddensity);
->>>>>>> parent of 7e8e7db... Went back to original version
-=======
-   CreateDenseGrid(r, numtaps, numband, bands, des, weight,
-                   &gridsize, Grid, D, W, symmetry);
->>>>>>> parent of 38b2312... Update remez.c
    InitialGuess(r, Ext, gridsize);
-   printf("Made guess\n\r");
 
 /*
  * For Differentiator: (fix grid)
@@ -692,21 +646,14 @@ int remez(double h[], int numtaps,
       }
    }
 
-    printf("Performing Remez\n\r");
-
 /*
  * Perform the Remez Exchange algorithm
  */
    for (iter=0; iter<MAXITERATIONS; iter++)
    {
       CalcParms(r, Ext, Grid, D, W, ad, x, y);
-      printf("CalcParms iter: %d\n\r", iter);
       CalcError(r, ad, x, y, gridsize, Grid, D, W, E);
-<<<<<<< HEAD
-<<<<<<< HEAD
-      printf("CalcError iter: %d\n\r", iter);
       Search(r, Ext, gridsize, E);
-      printf("Search iter: %d\n\r", iter);
       if (isDone(r, Ext, E))
          break;
    }
@@ -723,27 +670,7 @@ int remez(double h[], int numtaps,
       free(ad);
       return -1;
    }
-=======
-      int err = Search(r, Ext, gridsize, E);
-      if (err) error("error, %i, %i", err, gridsize);
-      //      for(i=0; i <= r; i++) assert(Ext[i]<gridsize);
-      if (isDone(r, Ext, E))
-         break;
-   }
->>>>>>> parent of 7e8e7db... Went back to original version
-
-   printf("Performed Remez\n\r");
-=======
-      Search(r, Ext, gridsize, E);
-      if (isDone(r, Ext, E))
-         break;
-   }
-   if (iter == MAXITERATIONS)
-   {
-      return -1;
-   }
->>>>>>> parent of 38b2312... Update remez.c
-
+   
    CalcParms(r, Ext, Grid, D, W, ad, x, y);
 
 /*
@@ -767,32 +694,13 @@ int remez(double h[], int numtaps,
          else
             c = sin(Pi * (double)i/numtaps);
       }
-<<<<<<< HEAD
-<<<<<<< HEAD
       taps[i] = ComputeA((double)i/numtaps, r, ad, x, y)*c;
-      printf("Tap[%d]: %g\n\r", i, taps[i]);
-=======
-      taps[i] = ComputeA((double)i / *numtaps, r, ad, x, y) * c;
->>>>>>> parent of 7e8e7db... Went back to original version
-=======
-      taps[i] = ComputeA((double)i/numtaps, r, ad, x, y)*c;
->>>>>>> parent of 38b2312... Update remez.c
    }
 
 /*
  * Frequency sampling design with calculated taps
  */
-<<<<<<< HEAD
-<<<<<<< HEAD
    FreqSample(numtaps, taps, h, symmetry);
-   printf("Freq Sampled\n\r");
-=======
-   FreqSample(*numtaps, taps, h, symmetry);
-=======
-   FreqSample(numtaps, taps, h, symmetry);
->>>>>>> parent of 38b2312... Update remez.c
-
->>>>>>> parent of 7e8e7db... Went back to original version
 /*
  * Delete allocated memory
  */

@@ -43,7 +43,7 @@
 
 #define PI 3.14159265 //For quick demos sake
 #define NANO_SECOND 1e-9
-#define NUMTAPS 201
+#define NUMTAPS 121
 #define NUMBANDS 2
 #define BANDS 4
 
@@ -104,7 +104,7 @@ int main(void)
     int file_desc = open("/dev/hsdk",0);
     double sample_time = ioctl(file_desc,0,0);
     double fs = 1/(sample_time*NANO_SECOND)*WINDOW_SIZE;
-    //printf("fs: %g\n\r", fs);
+    printf("fs: %g\n\r", fs);
 
     dataIn = fopen("/tmp/sample.bin", "rb");
     if (!dataIn)
@@ -128,8 +128,9 @@ int main(void)
     //data = zeroPad(data);
 
     //Use the Parks-McClellan Algorithm to create a lowpass filter
-    double fc1 = 1000;
-    double fc2 = 10000;
+
+    double fc1 = 200;
+    double fc2 = 1000000;
     double fc1_norm = 0.1;//fc1/fs/2;
     double fc2_norm = 0.2;//fc2/fs/2;
     double lpf[NUMTAPS];
@@ -144,11 +145,7 @@ int main(void)
     //If Parks-McClellan converged
     is_good = remez(lpf, NUMTAPS, NUMBANDS, bands, des, weight, type);
 
-    printf("remez flag: %d\n\r", is_good);
-    for(uint32_t i=0; i<NUMTAPS; i++)
-        //printf("lpf[%d]: %lf\n\r", i, lpf[i]);
-
-    if(is_good == 1)
+    if (is_good)
     {
         //Send signal and filter through FFTW
         double LPF_imag[data.length];
@@ -176,7 +173,6 @@ int main(void)
             if (i < NUMTAPS)
             {
                 in_lpf[i] = lpf[i];
-                //printf("lpf[%d]: %g\n\r", i, in_lpf[i]);
             }
             else
             {
