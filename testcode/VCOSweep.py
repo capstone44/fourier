@@ -27,3 +27,11 @@ for i in range(0x55F,0xABF):
 
     # Write out I2C command: address, reg_write_dac, msg[0], msg[1]
     bus.write_i2c_block_data(address, reg_write_dac, msg)
+
+#voltage = 0x7CF
+# Shift everything left by 4 bits and separate bytes
+#msg = (voltage & 0xff0) >> 4
+#msg = [msg, (msg & 0xf) << 4]
+
+# Write out I2C command: address, reg_write_dac, msg[0], msg[1]
+#bus.write_i2c_block_data(address, reg_write_dac, msg)

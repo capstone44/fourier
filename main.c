@@ -43,7 +43,7 @@
 
 #define PI 3.14159265 //For quick demos sake
 #define NANO_SECOND 1e-9
-#define NUMTAPS 121
+#define NUMTAPS 201
 #define NUMBANDS 2
 #define BANDS 4
 
@@ -104,7 +104,7 @@ int main(void)
     int file_desc = open("/dev/hsdk",0);
     double sample_time = ioctl(file_desc,0,0);
     double fs = 1/(sample_time*NANO_SECOND)*WINDOW_SIZE;
-    printf("fs: %g\n\r", fs);
+    //printf("fs: %g\n\r", fs);
 
     dataIn = fopen("/tmp/sample.bin", "rb");
     if (!dataIn)
@@ -127,21 +127,27 @@ int main(void)
     //data = zeroPad(data);
 
     //Use the Parks-McClellan Algorithm to create a lowpass filter
-    double fc1 = 60;
-    double fc2 = 1000;
-    double fc1_norm = fc1/fs;
-    double fc2_norm = fc2/fs;
+    double fc1 = 200;
+    double fc2 = 1000000;
+    double fc1_norm = fc1/fs/2;
+    double fc2_norm = fc2/fs/2;
     double lpf[NUMTAPS];
     double bands[BANDS] = {0, fc1_norm, fc2_norm, 1};
     double des[NUMBANDS] = {1, 0};
-    double weight[NUMBANDS] = {1, 1}; //TODO might need to change this
-    int type = 0;
-    int is_good;
+    double weight[NUMBANDS] = {1, 0.1};
+    int type = 1;
+    int is_good = false;
+
+    printf("fs: %g\n\r fc1_norm: %g\n\r fc2_norm: %g\n\r", fs, fc1_norm, fc2_norm);
 
     //If Parks-McClellan converged
     is_good = remez(lpf, NUMTAPS, NUMBANDS, bands, des, weight, type);
 
-    if (is_good)
+    printf("remez flag: %d\n\r", is_good);
+    for(uint32_t i=0; i<NUMTAPS; i++)
+        //printf("lpf[%d]: %lf\n\r", i, lpf[i]);
+
+    if(is_good == 1)
     {
         //Send signal and filter through FFTW
         double LPF_imag[data.length];
@@ -169,6 +175,7 @@ int main(void)
             if (i < NUMTAPS)
             {
                 in_lpf[i] = lpf[i];
+                //printf("lpf[%d]: %g\n\r", i, in_lpf[i]);
             }
             else
             {
@@ -199,8 +206,7 @@ int main(void)
         real_data.length = data.length / 2;
         imag_data.length = data.length / 2;
 
-        real_data.fs = imag_data.fs = fs; //6173300; //~18 MHz is roughly our sampling frequency, this is divided by 3 becasue we have decimated by 3
-        // TODO real_data.fs = imag_data.fs =
+        real_data.fs = imag_data.fs = fs/3;
 
         //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
         fftw_destroy_plan(plan_data);
@@ -226,6 +232,16 @@ int main(void)
                 LPF[i] = (LPF_real[i] + LPF_imag[i]) / scaler;
             }
         }
+
+        FILE *dataOut;
+        dataOut = fopen("LPF.txt","wb");
+        if(dataOut == NULL)
+            printf("Cannot create file\n\r");
+        for(uint32_t i=0; i<real_data.length; i++)
+        {
+            fprintf(dataOut, "%f\n", LPF[i]);
+        }
+        fclose(dataOut);
 
         psdx = filter(psdx, LPF);
     }
@@ -265,8 +281,7 @@ int main(void)
         real_data.length = data.length / 2;
         imag_data.length = data.length / 2;
 
-        //real_data.fs = imag_data.fs = 1000; //6173300; //~18 MHz is roughly our sampling frequency, this is divided by 3 becasue we have decimated by 3
-        // TODO real_data.fs = imag_data.fs =
+        real_data.fs = imag_data.fs = fs/3;
 
         //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
         fftw_destroy_plan(plan);
