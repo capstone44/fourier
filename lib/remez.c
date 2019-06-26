@@ -347,6 +347,7 @@ void Search(int r, int Ext[],
        ((E[j]<0.0) && (E[j]<E[j-1])))
       foundExt[k++] = j;
 
+
 /*
  * Remove extra extremals
  */
@@ -386,9 +387,6 @@ void Search(int r, int Ext[],
             l = foundExt[k-1];   /* Delete last extremal */
          else
             l = foundExt[0];     /* Delete first extremal */
-       /* Delete first extremal */
-       l = 0;
-       // PAK: changed from l = foundExt[0];     
       }
 
       for (j=l; j<k; j++)        /* Loop that does the deletion */
@@ -542,7 +540,7 @@ short isDone(int r, int Ext[], double E[])
  * double h[]      - Impulse response of final filter [numtaps]
  ********************/
 
-int remez(double h[], int numtaps,
+void remez(double h[], int numtaps,
            int numband, double bands[], double des[], double weight[],
            int type)
 {
@@ -660,17 +658,8 @@ int remez(double h[], int numtaps,
    if (iter == MAXITERATIONS)
    {
       printf("Reached maximum iteration count.\nResults may be bad.\n");
-      free(Grid);
-      free(W);
-      free(D);
-      free(E);
-      free(Ext);
-      free(x);
-      free(y);
-      free(ad);
-      return -1;
    }
-   
+
    CalcParms(r, Ext, Grid, D, W, ad, x, y);
 
 /*
@@ -701,6 +690,7 @@ int remez(double h[], int numtaps,
  * Frequency sampling design with calculated taps
  */
    FreqSample(numtaps, taps, h, symmetry);
+
 /*
  * Delete allocated memory
  */
@@ -712,6 +702,5 @@ int remez(double h[], int numtaps,
    free(x);
    free(y);
    free(ad);
-
-   return 1;
 }
+
