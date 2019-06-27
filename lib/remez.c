@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <R.h>
+#include <remez.h>
 
 #define CONST const
 #define BANDPASS       1
@@ -583,7 +583,7 @@ int isDone(int r, int Ext[], double E[])
  * double h[]      - Impulse response of final filter [numtaps]
  ********************/
 
-void remez(double h[], int *numtaps,
+int remez(double h[], int *numtaps,
       int *numband, const double bands[], 
       const double des[], const double weight[],
       int *type, int *griddensity)
@@ -696,7 +696,19 @@ void remez(double h[], int *numtaps,
       CalcParms(r, Ext, Grid, D, W, ad, x, y);
       CalcError(r, ad, x, y, gridsize, Grid, D, W, E);
       int err = Search(r, Ext, gridsize, E);
-      if (err) error("error, %i, %i", err, gridsize);
+      if (err) //error("error, %i, %i", err, gridsize);  
+      {
+        free(Grid);
+        free(W);
+        free(D);
+        free(E);
+        free(Ext);
+        free(taps);
+        free(x);
+        free(y);
+        free(ad);
+        return -1;
+      }
       //      for(i=0; i <= r; i++) assert(Ext[i]<gridsize);
       if (isDone(r, Ext, E))
          break;
@@ -745,6 +757,8 @@ void remez(double h[], int *numtaps,
    free(x);
    free(y);
    free(ad);
+
+   return 1;
 }
 
 

@@ -134,15 +134,19 @@ int main(void)
     double fc2_norm = fc2/fs/2;
     double lpf[NUMTAPS];
     double bands[BANDS] = {0, fc1_norm, fc2_norm, 1};
-    double des[NUMBANDS] = {1, 0};
-    double weight[NUMBANDS] = {1, 1};
-    int type = 1;
+    double des[2*NUMBANDS] = {1,1,0,0};
+    double weight[NUMBANDS] = {1,1};
+    int numtaps = 121;
+    int numband = 2;
+    int griddensity = 30;
+    int type = BANDPASS;
     int is_good = false;
 
     printf("fs: %g\n\r fc1_norm: %g\n\r fc2_norm: %g\n\r", fs, fc1_norm, fc2_norm);
 
     //If Parks-McClellan converged
-    is_good = remez(lpf, NUMTAPS, NUMBANDS, bands, des, weight, type);
+    //is_good = remez(lpf, NUMTAPS, NUMBANDS, bands, des, weight, type);
+    is_good = remez(lpf, &numtaps, &numband, bands, des, weight, &type, &griddensity);
 
     if (is_good)
     {
