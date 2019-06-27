@@ -540,7 +540,7 @@ short isDone(int r, int Ext[], double E[])
  * double h[]      - Impulse response of final filter [numtaps]
  ********************/
 
-void remez(double h[], int numtaps,
+int remez(double h[], int numtaps,
            int numband, double bands[], double des[], double weight[],
            int type)
 {
@@ -658,6 +658,17 @@ void remez(double h[], int numtaps,
    if (iter == MAXITERATIONS)
    {
       printf("Reached maximum iteration count.\nResults may be bad.\n");
+      
+      free(Grid);
+      free(W);
+      free(D);
+      free(E);
+      free(Ext);
+      free(x);
+      free(y);
+      free(ad);
+
+      return -1;
    }
 
    CalcParms(r, Ext, Grid, D, W, ad, x, y);
@@ -702,5 +713,7 @@ void remez(double h[], int numtaps,
    free(x);
    free(y);
    free(ad);
+   
+   return 1;
 }
 
