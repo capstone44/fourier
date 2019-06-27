@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <remez.h>
+#include <R.h>
 
 #define CONST const
 #define BANDPASS       1
@@ -701,24 +701,6 @@ void remez(double h[], int *numtaps,
       if (isDone(r, Ext, E))
          break;
    }
-<<<<<<< HEAD
-   if (iter == MAXITERATIONS)
-   {
-      printf("Reached maximum iteration count.\nResults may be bad.\n");
-      
-      free(Grid);
-      free(W);
-      free(D);
-      free(E);
-      free(Ext);
-      free(x);
-      free(y);
-      free(ad);
-
-      return -1;
-   }
-=======
->>>>>>> c338ad58b7dfa87ff45b995bb37d397a4d167235
 
    CalcParms(r, Ext, Grid, D, W, ad, x, y);
 
@@ -763,8 +745,6 @@ void remez(double h[], int *numtaps,
    free(x);
    free(y);
    free(ad);
-   
-   return 1;
 }
 
 
