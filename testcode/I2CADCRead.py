@@ -27,7 +27,7 @@ adc = Adafruit_ADS1x15.ADS1115()
 #  -   8 = +/-0.512V
 #  -  16 = +/-0.256V
 # See table 3 in the ADS1015/ADS1115 datasheet for more info on gain.
-GAIN = 1
+GAIN = 8
 
 print('Reading ADS1x15 values, press Ctrl-C to quit...')
 # Print nice channel column headers.
@@ -50,4 +50,4 @@ while True:
     # Print the ADC values.
     print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*values))
     # Pause for half a second.
-    time.sleep(0.5)
+    #time.sleep(0.5)

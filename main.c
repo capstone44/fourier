@@ -31,21 +31,20 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <liquid/liquid.h>
 #include "globals.h"
 #include "timeprocessing.h"
 #include "frequencyprocessing.h"
-#include "remez.h"
 
 #define CLIENT_SOCK_PATH "/tmp/power_data.sock"  //This is where you send data, you are the client to the python server.
 #define SERVER_SOCK_PATH "/tmp/gui_control.sock" //This is where you receive data, you are the server to the python client.
 #define BUFF_SIZE 16                             //The size of the rf_data struct - used for transmitting the structure
 #define TEST_RUN_LENGTH 60                       //Arbitrary test run length
 
-#define PI 3.14159265 //For quick demos sake
 #define NANO_SECOND 1e-9
-#define NUMTAPS 121
-#define NUMBANDS 2
-#define BANDS 4
+
+#define BANDS 2
+#define BAND_EDGES 4
 
 struct rf_data
 {
@@ -124,174 +123,60 @@ int main(void)
     data = reorderData(raw_adc_data, WINDOW_SIZE);
     data = decimateData(data);
     data = windowData(data);
-    //data = zeroPad(data);
 
-    //Use the Parks-McClellan Algorithm to create a lowpass filter
+    uint16_t fc1 = 200;
+    uint16_t fc2 = 10000;
+    double fc1_norm = fc1 / (fs/2);
+    double fc2_norm = fc2 / (fs/2);
+    uint16_t numtaps = 301;
+    uint8_t numbands = BANDS;
+    double bands[BAND_EDGES] = {};
+    double des[BANDS] = {};
+    double weights[BANDS] = {};
+    liquid_firdespm_btype btype = LIQUID_FIRDESPM_BANDPASS;
+    liquid_firdespm_wtype wtype[BANDS] = {LIQUID_FIRDESPM_FLATWEIGHT, LIQUID_FIRDESPM_EXPWEIGHT};
+    double *in;
+    double *out;
 
-    double fc1 = 200;
-    double fc2 = 1000000;
-    double fc1_norm = fc1/fs/2;
-    double fc2_norm = fc2/fs/2;
-    double lpf[NUMTAPS];
-    double bands[BANDS] = {0, fc1_norm, fc2_norm, 1};
-    double des[2*NUMBANDS] = {1,1,0,0};
-    double weight[NUMBANDS] = {1,1};
-    int numtaps = 121;
-    int numband = 2;
-    int griddensity = 30;
-    int type = BANDPASS;
-    int is_good = false;
+    fftw_plan plan;
 
-    printf("fs: %g\n\r fc1_norm: %g\n\r fc2_norm: %g\n\r", fs, fc1_norm, fc2_norm);
+    in = (double *)fftw_malloc(sizeof(double) * data.length);
+    out = (double *)fftw_malloc(sizeof(double) * data.length);
 
-    //If Parks-McClellan converged
-    //is_good = remez(lpf, NUMTAPS, NUMBANDS, bands, des, weight, type);
-    is_good = remez(lpf, &numtaps, &numband, bands, des, weight, &type, &griddensity);
+    plan = fftw_plan_r2r_1d(data.length, in, out, FFTW_R2HC, FFTW_MEASURE);
 
-    if (is_good)
+    for (uint32_t i = 0; i < data.length; i++)
     {
-        //Send signal and filter through FFTW
-        double LPF_imag[data.length];
-        double LPF_real[data.length];
-
-        double *in_data;
-        double *in_lpf;
-        double *out_data;
-        double *out_lpf;
-
-        fftw_plan plan_data;
-        fftw_plan plan_lpf;
-
-        in_data = (double *)fftw_malloc(sizeof(double) * data.length);
-        out_data = (double *)fftw_malloc(sizeof(double) * data.length);
-        in_lpf = (double *)fftw_malloc(sizeof(double) * data.length);
-        out_lpf = (double *)fftw_malloc(sizeof(double) * data.length);
-
-        plan_data = fftw_plan_r2r_1d(data.length, in_data, out_data, FFTW_R2HC, FFTW_MEASURE);
-        plan_lpf = fftw_plan_r2r_1d(data.length, in_lpf, out_lpf, FFTW_R2HC, FFTW_MEASURE);
-
-        for (uint32_t i = 0; i < data.length; i++)
-        {
-            in_data[i] = data.values[i];
-            if (i < NUMTAPS)
-            {
-                in_lpf[i] = lpf[i];
-            }
-            else
-            {
-                in_lpf[i] = 0;
-            }
-        }
-
-        fftw_execute(plan_data);
-        fftw_execute(plan_lpf);
-
-        imag_data.values[0] = 0;
-        LPF_imag[0] = 0;
-        for (uint32_t i = 0; i < data.length / 2 + 1; i++)
-        {
-            real_data.values[i] = out_data[i];
-            LPF_real[i] = out_lpf[i];
-        }
-        uint32_t j = data.length - 1;
-        for (uint32_t i = 1; i < data.length / 2; i++)
-        {
-            imag_data.values[i] = out_data[j];
-            LPF_imag[i] = out_lpf[j];
-            j--;
-        }
-        imag_data.values[0] = 0;
-        LPF_imag[0] = 0;
-
-        real_data.length = data.length / 2;
-        imag_data.length = data.length / 2;
-
-        real_data.fs = imag_data.fs = fs/3;
-
-        //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
-        fftw_destroy_plan(plan_data);
-        fftw_destroy_plan(plan_lpf);
-        fftw_free(in_data);
-        fftw_free(in_lpf);
-        fftw_free(out_data);
-        fftw_free(out_lpf);
-
-        psdx = calculateMagSquared(real_data, imag_data);
-
-        double LPF[psdx.length];
-        uint64_t scaler = (uint64_t) psdx.fs * (uint64_t) psdx.length * 2;
-
-        for (uint32_t i = 0; i < psdx.length; i++)
-        {
-            if (i != 0 && i != psdx.length)
-            {
-                LPF[i] = 2 * (LPF_real[i] + LPF_imag[i]) / scaler;
-            }
-            else
-            {
-                LPF[i] = (LPF_real[i] + LPF_imag[i]) / scaler;
-            }
-        }
-
-        printf("Writing output file\n\r");
-        FILE *dataOut;
-        dataOut = fopen("LPF.txt","wb");
-        if(dataOut == NULL)
-            printf("Cannot create file\n\r");
-        for(uint32_t i=0; i<real_data.length; i++)
-        {
-            fprintf(dataOut, "%f\n", LPF[i]);
-        }
-        fclose(dataOut);
-
-        psdx = filter(psdx, LPF);
+        in[i] = data.values[i];
     }
 
-    else
+    fftw_execute(plan);
+
+    imag_data.values[0] = 0;
+    for (uint32_t i = 0; i < data.length / 2 + 1; i++)
     {
-        double *in;
-        double *out;
-
-        fftw_plan plan;
-
-        in = (double *)fftw_malloc(sizeof(double) * data.length);
-        out = (double *)fftw_malloc(sizeof(double) * data.length);
-
-        plan = fftw_plan_r2r_1d(data.length, in, out, FFTW_R2HC, FFTW_MEASURE);
-
-        for (uint32_t i = 0; i < data.length; i++)
-        {
-            in[i] = data.values[i];
-        }
-
-        fftw_execute(plan);
-
-        imag_data.values[0] = 0;
-        for (uint32_t i = 0; i < data.length / 2 + 1; i++)
-        {
-            real_data.values[i] = out[i];
-        }
-        uint32_t j = data.length - 1;
-        for (uint32_t i = 1; i < data.length / 2; i++)
-        {
-            imag_data.values[i] = out[j];
-            j--;
-        }
-        imag_data.values[0] = 0;
-
-        real_data.length = data.length / 2;
-        imag_data.length = data.length / 2;
-
-        real_data.fs = imag_data.fs = fs/3;
-
-        //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
-        fftw_destroy_plan(plan);
-        fftw_free(in);
-        fftw_free(out);
-
-        psdx = calculateMagSquared(real_data, imag_data);
-        psdx = filter_default(psdx);
+        real_data.values[i] = out[i];
     }
+    uint32_t j = data.length - 1;
+    for (uint32_t i = 1; i < data.length / 2; i++)
+    {
+        imag_data.values[i] = out[j];
+        j--;
+    }
+    imag_data.values[0] = 0;
+
+    real_data.length = data.length / 2;
+    imag_data.length = data.length / 2;
+
+    real_data.fs = imag_data.fs = fs/3;
+
+    //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
+    fftw_destroy_plan(plan);
+    fftw_free(in);
+    fftw_free(out);
+
+    psdx = calculateMagSquared(real_data, imag_data);
+    psdx = filter_default(psdx);
 
     val = findPeak(psdx);
     interpolate(psdx, val, buf);

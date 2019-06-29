@@ -21,7 +21,7 @@ SS = hex/shader_256.hex \
 	hex/shader_4096k.hex
 
 # define the C compiler to use
-CC = gcc
+CC = gcc#g++
 
 # define any compile-time flags
 CFLAGS = -Wall -g
@@ -38,12 +38,12 @@ LFLAGS = -L./lib
 # define any libraries to link into executable:
 #   if I want to link in libraries (libx.so or libx.a) I use the -llibname
 #   option, something like (this will link in libmylib.so and libm.so:
-LIBS = -lfftw3 -lm -lrt -ldl
+LIBS = -lfftw3 -lm -lrt -ldl -lliquid
 
 # define the C source files
 FFTLIBS = lib/fftfiles
 S = $(FFTLIBS)/($SS)
-SRCS = main.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c lib/remez.c
+SRCS = main2.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c #lib/band.cpp lib/barycentric.cpp lib/cheby.cpp lib/eigenvalue.cpp lib/pm.cpp
 
 # define the C object files
 #
