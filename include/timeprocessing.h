@@ -78,6 +78,7 @@ void testCodeTime(struct signal data);
 /***************************************************************/
 /* Gaussian window weights calculated and exported from Matlab */
 /***************************************************************/
+/*
 const static double window_weights[DECIMATED_SIZE] = {
 4.3936933623407420e-02, 
 4.3969900003008447e-02, 
@@ -16746,5 +16747,5 @@ const static double window_weights[DECIMATED_SIZE] = {
 4.3969900003008447e-02, 
 4.3936933623407420e-02
 };
-
+*/
 #endif  // TIMEPROCESSING_H_

@@ -121,8 +121,8 @@ struct signal reorderData(uint32_t raw_adc_data[], uint32_t N){
 /* returned to the main function.              */
 /***********************************************/
 struct signal windowData(struct signal data){;
-    for(uint32_t i=0; i<data.length; i++)
-        data.values[i] *= window_weights[i];
+    //for(uint32_t i=0; i<data.length; i++)
+       // data.values[i] *= window_weights[i];
     return data;
 }
 

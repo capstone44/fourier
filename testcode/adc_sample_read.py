@@ -21,7 +21,7 @@ adc.start_adc(3,gain=GAIN,data_rate=860)
 print('Reading ADS1x15 values, press Ctrl-C to quit...')
 # Main loop.
 values = []
-for i in range(10000):
+for i in range(80):
     # Read all the ADC channel values in a list.
         # Read the specified ADC channel using the previously set gain value.
         values.append(adc.get_last_result())

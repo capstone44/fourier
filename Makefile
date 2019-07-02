@@ -38,12 +38,12 @@ LFLAGS = -L./lib
 # define any libraries to link into executable:
 #   if I want to link in libraries (libx.so or libx.a) I use the -llibname
 #   option, something like (this will link in libmylib.so and libm.so:
-LIBS = -lfftw3 -lm -lrt -ldl -lliquid
+LIBS = -lfftw3 -lm -lrt -ldl -lliquid -lwiringPi
 
 # define the C source files
 FFTLIBS = lib/fftfiles
 S = $(FFTLIBS)/($SS)
-SRCS = main2.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c #lib/band.cpp lib/barycentric.cpp lib/cheby.cpp lib/eigenvalue.cpp lib/pm.cpp
+SRCS = main.c lib/frequencyprocessing.c lib/globals.c lib/timeprocessing.c lib/ads.c
 
 # define the C object files
 #

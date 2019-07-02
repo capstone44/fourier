@@ -31,6 +31,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+#include <wiringPi.h>
+//#include <ads1115.h>
+#include "ads.h"
 #include <liquid/liquid.h>
 #include "globals.h"
 #include "timeprocessing.h"
@@ -42,7 +46,13 @@
 #define TEST_RUN_LENGTH 60                       //Arbitrary test run length
 
 #define NANO_SECOND 1e-9
+#define BYTES 4
+#define ADC_ADDR 0x48
+#define MY_BASE 2222
+#define ADC_CHAN 3
+#define ADC_SAMP 6
 
+#define NUMTAPS 301
 #define BANDS 2
 #define BAND_EDGES 4
 
@@ -62,8 +72,8 @@ int main(void)
     struct max_values val;
     double buf[FFT_SIZE] = {0};
     double Power;
-    FILE *dataIn;
-    uint32_t raw_adc_data[WINDOW_SIZE];
+    //FILE *dataIn;
+    //uint32_t raw_adc_data[WINDOW_SIZE];
     struct rf_data test_data;
 
     // Create variable to handle the UNIX socket
@@ -97,57 +107,49 @@ int main(void)
     }
 
     // Read sampled data
+    /*
     system("/bin/cat /dev/hsdk > /tmp/sample.bin");
     sleep(1);
     printf("Successfully sampled ADC\r\n");
     int file_desc = open("/dev/hsdk",0);
     double sample_time = ioctl(file_desc,0,0);
     double fs = 1/(sample_time*NANO_SECOND)*WINDOW_SIZE;
-
-    dataIn = fopen("/tmp/sample.bin", "rb");
-    if (!dataIn)
-    {
-        printf("Cannot open file\n\r");
-        return -1;
+    */
+    double fs = 860;
+   
+    ads1115Setup(MY_BASE, ADC_ADDR);
+    for(uint32_t i=0; i<WINDOW_SIZE; i++){
+        data.values[i] = analogRead(MY_BASE + 3);
     }
-
-    for (uint32_t i = 0; i < WINDOW_SIZE; i++)
-    {
-        fread(&raw_adc_data[i], sizeof(uint32_t), 1, dataIn);
-    }
-
-    fclose(dataIn);
 
     //Perform time processing
-    testCodeTime(raw_adc_data, WINDOW_SIZE);
-    data = reorderData(raw_adc_data, WINDOW_SIZE);
-    data = decimateData(data);
-    data = windowData(data);
+    //data = reorderData(raw_adc_data, WINDOW_SIZE);
+    //data = decimateData(data);
+    //data = windowData(data);
 
-    uint16_t fc1 = 200;
-    uint16_t fc2 = 10000;
-    double fc1_norm = fc1 / (fs/2);
-    double fc2_norm = fc2 / (fs/2);
-    uint16_t numtaps = 301;
-    uint8_t numbands = BANDS;
-    double bands[BAND_EDGES] = {};
-    double des[BANDS] = {};
-    double weights[BANDS] = {};
-    liquid_firdespm_btype btype = LIQUID_FIRDESPM_BANDPASS;
-    liquid_firdespm_wtype wtype[BANDS] = {LIQUID_FIRDESPM_FLATWEIGHT, LIQUID_FIRDESPM_EXPWEIGHT};
+    data.fs = fs;
+    data.length = WINDOW_SIZE;
+
     double *in;
     double *out;
 
     fftw_plan plan;
 
-    in = (double *)fftw_malloc(sizeof(double) * data.length);
-    out = (double *)fftw_malloc(sizeof(double) * data.length);
+    in = (double *)fftw_malloc(sizeof(double) * 4096);
+    out = (double *)fftw_malloc(sizeof(double) * 4096);
 
-    plan = fftw_plan_r2r_1d(data.length, in, out, FFTW_R2HC, FFTW_MEASURE);
+    plan = fftw_plan_r2r_1d(4096, in, out, FFTW_R2HC, FFTW_MEASURE);
 
-    for (uint32_t i = 0; i < data.length; i++)
+    for (uint32_t i = 0; i < 4096; i++)
     {
-        in[i] = data.values[i];
+        if(i < data.length)
+        {
+            in[i] = data.values[i];
+        }
+        else
+        {
+            in[i] = 0;
+        }
     }
 
     fftw_execute(plan);
@@ -168,7 +170,7 @@ int main(void)
     real_data.length = data.length / 2;
     imag_data.length = data.length / 2;
 
-    real_data.fs = imag_data.fs = fs/3;
+    real_data.fs = imag_data.fs = fs;
 
     //when using this in real application save plan through fftw_export_wisdom_to_filename(const char *filename);
     fftw_destroy_plan(plan);
@@ -176,7 +178,7 @@ int main(void)
     fftw_free(out);
 
     psdx = calculateMagSquared(real_data, imag_data);
-    psdx = filter_default(psdx);
+    //psdx = filter_default(psdx);
 
     val = findPeak(psdx);
     interpolate(psdx, val, buf);

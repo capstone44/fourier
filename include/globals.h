@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define WINDOW_SIZE 50000       //Size of data coming in from ADC after interleaving
+#define WINDOW_SIZE 40//10000       //Size of data coming in from ADC after interleaving
 #define DECIMATION_FACTOR 3
 #define DECIMATED_SIZE WINDOW_SIZE/DECIMATION_FACTOR
 #define ADC_LENGTH 10
