@@ -46,15 +46,11 @@
 #define TEST_RUN_LENGTH 60                       //Arbitrary test run length
 
 #define NANO_SECOND 1e-9
-#define BYTES 4
+#define FFT_SIZE 4096
+
 #define ADC_ADDR 0x48
 #define MY_BASE 2222
-#define ADC_CHAN 3
-#define ADC_SAMP 6
 
-#define NUMTAPS 301
-#define BANDS 2
-#define BAND_EDGES 4
 
 struct rf_data
 {
@@ -73,7 +69,7 @@ int main(void)
     double buf[FFT_SIZE] = {0};
     double Power;
     //FILE *dataIn;
-    //uint32_t raw_adc_data[WINDOW_SIZE];
+    uint32_t raw_adc_data[WINDOW_SIZE];
     struct rf_data test_data;
 
     // Create variable to handle the UNIX socket
@@ -119,28 +115,31 @@ int main(void)
    
     ads1115Setup(MY_BASE, ADC_ADDR);
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
-        data.values[i] = analogRead(MY_BASE + 3);
+        raw_adc_data[i] = analogRead(MY_BASE + 3)
+        data.values[i] = (double)raw_adc_data[i];
+        //data.values[i] = (double)analogRead(MY_BASE + 3);
     }
-
-    //Perform time processing
-    //data = reorderData(raw_adc_data, WINDOW_SIZE);
-    //data = decimateData(data);
-    //data = windowData(data);
 
     data.fs = fs;
     data.length = WINDOW_SIZE;
+
+    //Perform time processing
+    testCodeTime(raw_adc_data, WINDOW_SIZE);
+    //data = reorderData(raw_adc_data, WINDOW_SIZE);
+    //data = decimateData(data);
+    data = windowData(data);
 
     double *in;
     double *out;
 
     fftw_plan plan;
 
-    in = (double *)fftw_malloc(sizeof(double) * 4096);
-    out = (double *)fftw_malloc(sizeof(double) * 4096);
+    in = (double *)fftw_malloc(sizeof(double) * FFT_SIZE);
+    out = (double *)fftw_malloc(sizeof(double) * FFT_SIZE);
 
-    plan = fftw_plan_r2r_1d(4096, in, out, FFTW_R2HC, FFTW_MEASURE);
+    plan = fftw_plan_r2r_1d(FFT_SIZE, in, out, FFTW_R2HC, FFTW_MEASURE);
 
-    for (uint32_t i = 0; i < 4096; i++)
+    for (uint32_t i = 0; i < FFT_SIZE; i++)
     {
         if(i < data.length)
         {
