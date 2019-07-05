@@ -64,7 +64,7 @@ struct signal calculateMagSquared(struct signal real_data, struct signal imag_da
 /*****************************************************/
 struct signal filter_default(struct signal data){
     for(uint32_t i=0; i<data.length; i++){
-        data.values[i] *= filter_mag_squared[i];
+        //data.values[i] *= filter_mag_squared[i];
     }
     return data;
 }

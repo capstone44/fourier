@@ -89,6 +89,7 @@ void testCodeFreq(struct signal data);
 /* and exported from Matlab. Used as default if remez      */
 /* function does not converge.                             */
 /***********************************************************/
+/*
 const static float filter_mag_squared[FFT_SIZE] = {
 3.8275960035824268e-03, 
 3.8498236579794236e-03, 
@@ -16475,5 +16476,5 @@ const static float filter_mag_squared[FFT_SIZE] = {
 5.9762015160016276e-06, 
 6.0027899419062187e-06, 
 6.0027899419062187e-06};
-
+*/
 #endif  // FREQUENCYPROCESSING_H_

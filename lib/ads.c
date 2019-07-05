@@ -259,7 +259,7 @@ int ads1115Setup(const int pinBase, int i2cAddr)
     node = wiringPiNewNode(pinBase,8);
 
     node->fd = fd;
-    node->data0 = CONFIG_PGA_4_096V;
+    node->data0 = CONFIG_PGA_0_256V;
     node->data1 = CONFIG_DR_860SPS;
     node->analogRead = myAnalogRead;
     node->analogWrite = myAnalogWrite;

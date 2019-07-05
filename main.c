@@ -46,7 +46,6 @@
 #define TEST_RUN_LENGTH 60                       //Arbitrary test run length
 
 #define NANO_SECOND 1e-9
-#define FFT_SIZE 4096
 
 #define ADC_ADDR 0x48
 #define MY_BASE 2222
@@ -69,7 +68,7 @@ int main(void)
     double buf[FFT_SIZE] = {0};
     double Power;
     //FILE *dataIn;
-    uint32_t raw_adc_data[WINDOW_SIZE];
+    //uint32_t raw_adc_data[WINDOW_SIZE];
     struct rf_data test_data;
 
     // Create variable to handle the UNIX socket
@@ -112,32 +111,49 @@ int main(void)
     double fs = 1/(sample_time*NANO_SECOND)*WINDOW_SIZE;
     */
     double fs = 860;
-   
+
     ads1115Setup(MY_BASE, ADC_ADDR);
     for(uint32_t i=0; i<WINDOW_SIZE; i++){
-        raw_adc_data[i] = analogRead(MY_BASE + 3)
-        data.values[i] = (double)raw_adc_data[i];
-        //data.values[i] = (double)analogRead(MY_BASE + 3);
+        data.values[i] = (double)analogRead(MY_BASE + 3);
+//        printf("data[%d]: %g\n\r", i, data.values[i]);
     }
 
     data.fs = fs;
     data.length = WINDOW_SIZE;
 
     //Perform time processing
-    testCodeTime(raw_adc_data, WINDOW_SIZE);
     //data = reorderData(raw_adc_data, WINDOW_SIZE);
     //data = decimateData(data);
-    data = windowData(data);
+//    data = windowData(data);
+
+    float h[121];
+    uint32_t n = 1001;
+    uint32_t fc = 100;
+    uint32_t fc2 = 300;
+    uint32_t numbands = 2;
+    float bands[4] = {0.00f, 0.10f, 0.25f, 0.50f};
+    float des[2] = {1.0f,0.0f};
+    float weights[2] = {1.0f, 1.0f};
+    liquid_firdespm_btype btype = LIQUID_FIRDESPM_BANDPASS;
+    liquid_firdespm_wtype wtype[2]= {LIQUID_FIRDESPM_FLATWEIGHT, LIQUID_FIRDESPM_FLATWEIGHT};
+
+//    firdespm_run(n, numbands, bands, des, weights, wtype, btype, h);
 
     double *in;
     double *out;
+//    double *in_h;
+//    double *out_h;
 
     fftw_plan plan;
+//    fftw_plan plan_h;
 
     in = (double *)fftw_malloc(sizeof(double) * FFT_SIZE);
     out = (double *)fftw_malloc(sizeof(double) * FFT_SIZE);
+//    in_h = (double *)fftw_malloc(sizeof(double) * FFT_SIZE);
+//    out_h = (double *)fftw_malloc(sizeof(double) * FFT_SIZE);
 
     plan = fftw_plan_r2r_1d(FFT_SIZE, in, out, FFTW_R2HC, FFTW_MEASURE);
+//    plan_h = fftw_plan_r2r_1d(FFT_SIZE, in_h, out_h, FFTW_R2HC, FFTW_MEASURE);
 
     for (uint32_t i = 0; i < FFT_SIZE; i++)
     {
@@ -146,28 +162,43 @@ int main(void)
             in[i] = data.values[i];
         }
         else
-        {
+       {
             in[i] = 0;
         }
+        if(i < n){
+//            in_h[i] = (double)h[i];
+        }
+        else{
+//            in_h[i] = 0;
+        }
+
     }
 
     fftw_execute(plan);
+//    fftw_execute(plan_h);
+
+//    double H_real[FFT_SIZE] = {0};
+//    double H_imag[FFT_SIZE] = {0};
 
     imag_data.values[0] = 0;
-    for (uint32_t i = 0; i < data.length / 2 + 1; i++)
+//    H_imag[0] = 0;
+    for (uint32_t i = 0; i < FFT_SIZE / 2 + 1; i++)
     {
         real_data.values[i] = out[i];
+//        H_real[i] = out_h[i];
     }
-    uint32_t j = data.length - 1;
-    for (uint32_t i = 1; i < data.length / 2; i++)
+    uint32_t j = FFT_SIZE - 1;
+    for (uint32_t i = 1; i < FFT_SIZE / 2; i++)
     {
         imag_data.values[i] = out[j];
+//        H_imag[i] = out_h[j];
         j--;
     }
     imag_data.values[0] = 0;
+//    H_imag[0] = 0;
 
-    real_data.length = data.length / 2;
-    imag_data.length = data.length / 2;
+    real_data.length = FFT_SIZE / 2;
+    imag_data.length = FFT_SIZE / 2;
 
     real_data.fs = imag_data.fs = fs;
 
@@ -175,9 +206,31 @@ int main(void)
     fftw_destroy_plan(plan);
     fftw_free(in);
     fftw_free(out);
+ //   fftw_destroy_plan(plan_h);
+ //   fftw_free(in_h);
+ //   fftw_free(out_h);
 
+ /*   double H[FFT_SIZE] = {0};
+    uint64_t scaler = (uint64_t) fs * FFT_SIZE * 2;
+
+    for(uint32_t i=0; i<FFT_SIZE/2; i++)
+    {
+        if(i != 0 && i != FFT_SIZE/2)
+        {
+            H[i] = 2*(H_real[i]+H_imag[i])/scaler;
+        }
+        else
+        {
+            H[i] = (H_real[i] + H_imag[i])/scaler;
+        }
+    }
+
+    for(uint32_t i=0; i<100; i++){
+        printf("H[%d]: %g\n\r", i, H[i]);
+    }
+*/
     psdx = calculateMagSquared(real_data, imag_data);
-    //psdx = filter_default(psdx);
+    //psdx = filter(psdx, H);
 
     val = findPeak(psdx);
     interpolate(psdx, val, buf);
@@ -200,6 +253,7 @@ int main(void)
         exit(1);
     }
 
+    printf("Max Freq: %g\n\r", val.actual_max_frequency);
     //printf("psdx fs: %d\n\r", psdx.fs);
     //printf("Power output: %lf\n\r\n\r", Power);
 

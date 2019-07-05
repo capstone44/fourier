@@ -24,7 +24,7 @@
 #define DECIMATION_FACTOR 3
 #define DECIMATED_SIZE WINDOW_SIZE/DECIMATION_FACTOR
 #define ADC_LENGTH 10
-//#define FFT_SIZE 32768
+#define FFT_SIZE 16384
 //#define LOG_FFT_SIZE 15
 
 /**************************************************************/
@@ -36,8 +36,8 @@ typedef struct signal
 {
     uint32_t length;
     uint32_t fs;
-    double values[WINDOW_SIZE];
-    double frequencies[WINDOW_SIZE];
+    double values[FFT_SIZE];
+    double frequencies[FFT_SIZE];
 }signal;
 
 /**************************************************************/
