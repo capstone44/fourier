@@ -22,14 +22,17 @@ void main (void) {
         printf("Failed to acquire bus access and/or talk to slave.\n");
         exit(1);
     }
-
-    char buf[3] = {0};
+    // 172 is 86*2, +1 is for the control byte, and +10 is for optimization
+    // slack.  We only write 172+1 to the DAC
+    char buf[172 + 1 + 10] = {0};
     buf[0] = 0x16; // Register we are writing to
+    int k = 1;
+    for(int i = 0x55; i <= 0xAB; i++){
+            buf[k] = i;
+            k += 2;
+    }
+
     while (1){
-        for(int i = 0x55F; i < 0xABF; i += 8){
-            buf[1] = (i & 0xff0) >> 4;
-            buf[2] = (buf[1] & 0xf) << 4;
-            write(file,buf,3);
-        }
+        write(file,buf,172 + 1);
     }
 }
