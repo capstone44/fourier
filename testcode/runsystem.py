@@ -86,7 +86,7 @@ def runsystem (stepAngle, rotationSize):
 
     # rotates half way of full rotation size
     set_direction(0)
-    for i in range(0,spin/2):
+    for i in range(0,int(spin/2)):
         stepNum = stepNum + 1
         step_once()
 
@@ -117,7 +117,7 @@ def runsystem (stepAngle, rotationSize):
 
     # return back to starting point
     set_direction(0)
-    for i in range(0,spin/2):
+    for i in range(0,int(spin/2)):
         stepNum = stepNum + 1
         step_once()
     print('closing socket')
