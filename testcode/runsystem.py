@@ -1,4 +1,3 @@
-from i2cstep import *
 import smbus
 from time import sleep
 import socket
@@ -61,11 +60,11 @@ def runsystem (stepAngle, rotationSize):
 
     # Connect the socket to the port where the server is listening
     server_address = '/tmp/power_data.sock'
-    print >>sys.stderr, 'connecting to %s' % server_address
+    print('connecting to %s',server_address)
     try:
         sock.connect(server_address)
-    except socket.error, msg:
-        print >>sys.stderr, msg
+    except(socket.error, msg):
+        print(msg)
         sys.exit(1)
     # Create an ADS1115 ADC (16-bit) instance.
     adc = Adafruit_ADS1x15.ADS1115()
@@ -113,15 +112,15 @@ def runsystem (stepAngle, rotationSize):
         currAngle = convertAngleToPlot(stepNum)
         msg = struct.pack("dd",currPwr,currAngle)
         sock.sendall(msg)
-        print >>sys.stderr, "Angle: " + str(currAngle) + " Power: " + str(currPwr)
-        print >>sys.stderr, 'sent another data point'
+        print("Angle: " + str(currAngle) + " Power: " + str(currPwr))
+        print('sent another data point')
 
     # return back to starting point
     set_direction(0)
     for i in range(0,spin/2):
         stepNum = stepNum + 1
         step_once()
-    print >>sys.stderr, 'closing socket'
+    print('closing socket')
     sock.close()
     # Disable Power Amplifier
     pa_reg = 0x10
